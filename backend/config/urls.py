@@ -85,14 +85,12 @@ urlpatterns = [
     path('api/', include('notifications.urls')),
 ]
 
-# Media files serving in development
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-else:
-    # Also support uploaded media in production if stored locally
-    urlpatterns += [
-        re_path(r'^media/(?P<path>.*)$', static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)[0].callback, {'document_root': settings.MEDIA_ROOT})
-    ]
+from django.views.static import serve
+
+# Media files serving (GPay QR code, driver photos, vehicles)
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+]
 
 # Catch-all frontend route to serve HTML, CSS, JS directly under the SAME single URL!
 urlpatterns += [
