@@ -14,6 +14,7 @@ def health_check(request):
 
 urlpatterns = [
     path('django-admin/', admin.site.urls),
+    path('', health_check, name='root_health'),
     path('api/health/', health_check, name='api_health'),
 
     # Auth & Profile
