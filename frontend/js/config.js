@@ -2,13 +2,21 @@
  * JhazTaxi - Centralized Configuration
  * Switch easily between local development and production (e.g. Render).
  */
+const isIndependentFrontend = (
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1' &&
+    window.location.hostname.includes('vercel.app')
+);
+
 const CONFIG = {
     // Backend API Base URL
-    // Defaults to local Django server during development, or change to Render production URL
+    // Single-Origin on Render: uses relative '/api' for 100% zero-config single URL!
+    // Vercel separate frontend: falls back to Render backend
+    // Live Server (port 5500): falls back to local port 8000
     API_BASE_URL: localStorage.getItem('JHAZTAXI_API_URL') || (
-        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-            ? 'http://127.0.0.1:8000/api'
-            : 'https://jhaztaxi-backend.onrender.com/api'
+        isIndependentFrontend
+            ? 'https://jhaztaxi.onrender.com/api'
+            : (window.location.port === '5500' ? 'http://127.0.0.1:8000/api' : '/api')
     ),
 
     // App Branding

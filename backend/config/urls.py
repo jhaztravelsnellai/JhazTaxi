@@ -1,6 +1,11 @@
+import mimetypes
+from pathlib import Path
 from django.contrib import admin
-from django.urls import path, include
-from django.http import JsonResponse
+from django.urls import path, include, re_path
+from django.http import JsonResponse, Http404, FileResponse
+from django.conf import settings
+from django.conf.urls.static import static
+
 from users.views import admin_customers_list_view, admin_customer_toggle_status_view
 from bookings.analytics import admin_dashboard_stats_view, admin_reports_view, user_dashboard_stats_view
 
@@ -12,9 +17,51 @@ def health_check(request):
         'database': 'operational'
     })
 
+FRONTEND_DIR = settings.BASE_DIR.parent / 'frontend'
+
+def serve_frontend(request, resource_path=''):
+    clean_path = resource_path.strip('/')
+    if not clean_path:
+        target = FRONTEND_DIR / 'index.html'
+    else:
+        target = (FRONTEND_DIR / clean_path).resolve()
+        # Security: ensure file is inside FRONTEND_DIR
+        try:
+            target.relative_to(FRONTEND_DIR.resolve())
+        except ValueError:
+            raise Http404("Forbidden")
+
+        if target.is_dir():
+            target = target / 'index.html'
+        elif not target.exists():
+            # Support clean URLs: e.g. /login -> /login.html
+            html_candidate = target.with_suffix('.html')
+            if html_candidate.exists():
+                target = html_candidate
+
+    if not target.exists() or not target.is_file():
+        raise Http404(f"Resource not found: {resource_path}")
+
+    content_type, _ = mimetypes.guess_type(str(target))
+    if not content_type:
+        if target.suffix == '.js':
+            content_type = 'application/javascript'
+        elif target.suffix == '.css':
+            content_type = 'text/css'
+        elif target.suffix == '.svg':
+            content_type = 'image/svg+xml'
+        elif target.suffix in ['.json', '.webmanifest']:
+            content_type = 'application/json'
+        else:
+            content_type = 'application/octet-stream'
+
+    response = FileResponse(open(target, 'rb'), content_type=content_type)
+    if target.suffix in ['.css', '.js', '.svg', '.png', '.jpg', '.ico', '.woff2']:
+        response['Cache-Control'] = 'public, max-age=86400'
+    return response
+
 urlpatterns = [
     path('django-admin/', admin.site.urls),
-    path('', health_check, name='root_health'),
     path('api/health/', health_check, name='api_health'),
 
     # Auth & Profile
@@ -38,8 +85,16 @@ urlpatterns = [
     path('api/', include('notifications.urls')),
 ]
 
-from django.conf import settings
-from django.conf.urls.static import static
-
+# Media files serving in development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    # Also support uploaded media in production if stored locally
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)[0].callback, {'document_root': settings.MEDIA_ROOT})
+    ]
+
+# Catch-all frontend route to serve HTML, CSS, JS directly under the SAME single URL!
+urlpatterns += [
+    re_path(r'^(?P<resource_path>.*)$', serve_frontend, name='frontend_app'),
+]
