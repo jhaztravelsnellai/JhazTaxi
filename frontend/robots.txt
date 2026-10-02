@@ -1,0 +1,24 @@
+# robots.txt for JhazTaxi Platform
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /booking.html
+Allow: /vehicles.html
+Allow: /about.html
+Allow: /contact.html
+Allow: /login.html
+Allow: /register.html
+Allow: /driver/login.html
+Allow: /driver/register.html
+Allow: /css/
+Allow: /js/
+Allow: /assets/
+
+# Block Private and Authenticated Portals
+Disallow: /admin/
+Disallow: /user/
+Disallow: /driver/dashboard.html
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://jhaztaxi.com/sitemap.xml

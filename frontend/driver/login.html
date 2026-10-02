@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Partner Sign In - JhazTaxi Fleet</title>
+    <meta name="description" content="Driver partner login portal for JhazTaxi. Access available booking requests, accept rides, and manage your trips.">
+    <meta name="robots" content="noindex, follow">
+    <link rel="canonical" href="https://jhaztaxi.com/driver/login.html">
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg">
+    <meta name="theme-color" content="#FFC107">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/config.js"></script>
+    <script>
+        // If already logged in as driver, go directly to driver dashboard
+        (function() {
+            const token = getAuthToken();
+            const user = getCurrentUser();
+            if (token && user) {
+                if (user.role === 'driver') {
+                    window.location.replace('/driver/dashboard.html');
+                } else if (user.role === 'admin') {
+                    window.location.replace('/admin/dashboard.html');
+                } else {
+                    window.location.replace('/index.html');
+                }
+            }
+        })();
+    </script>
+</head>
+<body style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); min-height: 100vh; display: flex; flex-direction: column;">
+
+    <!-- TOP BAR -->
+    <nav class="navbar navbar-dark navbar-jhaz border-bottom border-secondary border-opacity-25">
+        <div class="container">
+            <a class="navbar-brand navbar-brand-jhaz d-flex align-items-center gap-2" href="/index.html">
+                <span class="brand-badge bg-warning text-dark fw-bold">JH</span>
+                <span class="text-white">JhazTaxi <span class="badge bg-warning text-dark font-monospace" style="font-size: 0.7rem;">DRIVER PARTNER</span></span>
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                <a href="/login.html" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-person me-1"></i> Customer Login
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN LOGIN CARD -->
+    <div class="container py-5 my-auto">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-5">
+                <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white">
+                    <div class="text-center mb-4">
+                        <div class="rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center mb-3 shadow" style="width: 64px; height: 64px;">
+                            <i class="bi bi-car-front-fill fs-2"></i>
+                        </div>
+                        <h1 class="h3 fw-bold mb-1 text-dark">Driver Partner Sign In</h1>
+                        <p class="text-muted small">Log in to view customer booking pool & earn with JhazTaxi</p>
+                    </div>
+
+                    <form onsubmit="handleDriverLogin(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-uppercase">Mobile Number or Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-telephone-fill text-primary"></i></span>
+                                <input type="text" name="email" id="driver-login-identifier" class="form-control" placeholder="+91 98450 12345 or driver@jhaztaxi.com" required autofocus>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label small fw-bold text-uppercase mb-0">Password</label>
+                                <a href="javascript:void(0)" onclick="showToast('Please contact dispatch support (+91 90000 00000) to reset driver pin.', 'info')" class="small text-muted text-decoration-none">Forgot?</a>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-key-fill text-warning"></i></span>
+                                <input type="password" name="password" id="driver-login-password" class="form-control" placeholder="Enter password" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btn-driver-signin" class="btn btn-warning text-dark w-100 py-2 fw-bold fs-6 mb-3 shadow-sm">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Access Driver Dashboard
+                        </button>
+                    </form>
+
+                    <div class="text-center pt-3 border-top small">
+                        <span class="text-muted">New driver with a cab?</span>
+                        <a href="/driver/register.html" class="fw-bold text-dark text-decoration-underline ms-1">
+                            Register as Driver Partner &rarr;
+                        </a>
+                    </div>
+
+                    <div class="text-center mt-3 pt-2 text-muted small">
+                        <span>Passenger looking for rides?</span>
+                        <a href="/login.html" class="text-primary fw-bold text-decoration-none ms-1">Customer Sign In</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="py-3 text-center text-white-50 small mt-auto border-top border-secondary border-opacity-25">
+        <div class="container">
+            &copy; 2026 JhazTaxi &bull; Dedicated Driver Fleet Operations
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/auth.js"></script>
+</body>
+</html>

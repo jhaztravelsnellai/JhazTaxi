@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - JhazTaxi</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-jhaz sticky-top">
+        <div class="container">
+            <a class="navbar-brand navbar-brand-jhaz" href="/index.html">
+                <span class="brand-badge">JH</span>
+                <span>JhazTaxi</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item"><a class="nav-link nav-link-jhaz" href="/index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-jhaz" href="/booking.html">Book a Ride</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-2" id="navbar-auth-section"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-wrapper">
+        <div class="container">
+            <div class="row g-4">
+                <!-- User Sidebar -->
+                <div class="col-lg-3">
+                    <div class="card border-0 shadow-sm p-3 rounded-4 mb-4 user-sidebar-nav">
+                        <div class="p-3 border-bottom mb-2 text-center">
+                            <i class="bi bi-person-circle fs-1 text-warning"></i>
+                            <h5 class="fw-bold mt-2 mb-0" id="sidebar-user-name">Rider</h5>
+                            <span class="badge bg-light text-muted border">Customer</span>
+                        </div>
+                        <a href="/user/dashboard.html" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                        <a href="/user/bookings.html" class="nav-link active"><i class="bi bi-calendar2-check"></i> My Bookings</a>
+                        <a href="/booking.html" class="nav-link text-warning text-dark"><i class="bi bi-plus-circle-fill"></i> Book New Ride</a>
+                        <a href="/user/profile.html" class="nav-link"><i class="bi bi-person-gear"></i> My Profile</a>
+                        <a href="/user/notifications.html" class="nav-link"><i class="bi bi-bell"></i> Notifications</a>
+                        <hr class="my-2">
+                        <a href="javascript:void(0)" onclick="handleGlobalLogout()" class="nav-link text-danger"><i class="bi bi-box-arrow-right"></i> Sign Out</a>
+                    </div>
+                </div>
+
+                <div class="col-lg-9">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                        <div class="card-header bg-white p-4 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-3">
+                            <div>
+                                <h4 class="fw-bold mb-0">My Bookings History</h4>
+                                <p class="text-muted small mb-0">Full record of all your requested, active, and completed journeys.</p>
+                            </div>
+                            <!-- Filter pills -->
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-dark btn-sm active" onclick="setFilter(this, 'all')">All</button>
+                                <button type="button" class="btn btn-outline-dark btn-sm" onclick="setFilter(this, 'pending')">Pending</button>
+                                <button type="button" class="btn btn-outline-dark btn-sm" onclick="setFilter(this, 'driver_assigned')">Assigned</button>
+                                <button type="button" class="btn btn-outline-dark btn-sm" onclick="setFilter(this, 'trip_completed')">Completed</button>
+                                <button type="button" class="btn btn-outline-dark btn-sm" onclick="setFilter(this, 'cancelled')">Cancelled</button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Booking ID</th>
+                                        <th>Schedule</th>
+                                        <th>Route</th>
+                                        <th>Vehicle</th>
+                                        <th>Driver</th>
+                                        <th>Distance</th>
+                                        <th>Fare</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="user-bookings-table-body">
+                                    <tr>
+                                        <td colspan="9" class="text-center py-4"><span class="spinner-border spinner-yellow"></span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/user.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const u = getCurrentUser();
+            if (u) {
+                const nameEl = document.getElementById('sidebar-user-name');
+                if (nameEl) nameEl.textContent = u.first_name || u.username;
+            }
+            loadCustomerBookings('all');
+        });
+
+        function setFilter(btn, status) {
+            document.querySelectorAll('.btn-group .btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            loadCustomerBookings(status);
+        }
+    </script>
+</body>
+</html>

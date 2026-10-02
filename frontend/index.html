@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JhazTaxi - Your Ride, Your Way | Premium Taxi Booking</title>
+    <meta name="description" content="Safe, Reliable and Affordable Taxi Booking at Your Fingertips with JhazTaxi. Instant fare calculation, real-time map routing, and professional verified drivers.">
+    <meta name="keywords" content="taxi booking, cab service, book cab online, outstation taxi, airport transfer, Sedan, SUV, instant fare calculation, JhazTaxi, safe rides">
+    <meta name="author" content="JhazTaxi">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <link rel="canonical" href="https://jhaztaxi.com/">
+
+    <!-- Favicon & PWA -->
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg">
+    <link rel="apple-touch-icon" href="/assets/icons/favicon.svg">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#FFC107">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:url" content="https://jhaztaxi.com/">
+    <meta property="og:site_name" content="JhazTaxi">
+    <meta property="og:title" content="JhazTaxi - Your Ride, Your Way | Premium Taxi Booking">
+    <meta property="og:description" content="Safe, Reliable and Affordable Taxi Booking at Your Fingertips with JhazTaxi. Instant fare calculation, real-time map routing, and professional drivers.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@JhazTaxi">
+    <meta name="twitter:title" content="JhazTaxi - Your Ride, Your Way | Premium Taxi Booking">
+    <meta name="twitter:description" content="Safe, Reliable and Affordable Taxi Booking at Your Fingertips. Transparent upfront pricing, zero hidden charges.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80">
+
+    <!-- Schema.org JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "TaxiService",
+          "@id": "https://jhaztaxi.com/#taxiorg",
+          "name": "JhazTaxi",
+          "url": "https://jhaztaxi.com",
+          "logo": "https://jhaztaxi.com/assets/icons/logo.svg",
+          "image": "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80",
+          "telephone": "+91-80000-12345",
+          "priceRange": "₹₹",
+          "currenciesAccepted": "INR",
+          "paymentAccepted": "Cash, UPI, Credit Card, Debit Card, Online Payment",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "MG Road, Indiranagar",
+            "addressLocality": "Bengaluru",
+            "addressRegion": "Karnataka",
+            "postalCode": "560038",
+            "addressCountry": "IN"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 12.9716,
+            "longitude": 77.5946
+          },
+          "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            "opens": "00:00",
+            "closes": "23:59"
+          },
+          "serviceArea": {
+            "@type": "City",
+            "name": "Bengaluru"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How is the fare calculated on JhazTaxi?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Fare is calculated based on exact GPS road distance multiplied by the vehicle rate per kilometer, plus base booking fee, transparently displayed before booking."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I choose my driver or vehicle type?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, you can choose from Sedan, Mini, SUV, and Premium vehicles during booking, and see verified driver ratings and cab details upon assignment."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How do I register as a driver partner?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "You can visit our Driver Partner Portal at /driver/register.html, upload your driver picture, car photo, license, and vehicle registration number to join our fleet."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+    
+    <!-- Bootstrap 5 CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Auth Route Guard: Requires login to view Home Page -->
+    <script src="/js/config.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        checkLandingAuth();
+    </script>
+</head>
+<body>
+
+    <!-- 1. NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-jhaz sticky-top">
+        <div class="container">
+            <a class="navbar-brand navbar-brand-jhaz" href="/index.html">
+                <span class="brand-badge">JH</span>
+                <span>JhazTaxi</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item"><a class="nav-link nav-link-jhaz active" href="/index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-jhaz" href="/booking.html">Book a Ride</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-jhaz" href="/vehicles.html">Vehicles</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-jhaz" href="/about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-jhaz" href="/contact.html">Contact</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-2" id="navbar-auth-section">
+                    <a href="/login.html" class="btn btn-outline-yellow btn-sm"><i class="bi bi-person me-1"></i> Customer Login</a>
+                    <a href="/driver/login.html" class="btn btn-warning text-dark btn-sm fw-bold"><i class="bi bi-car-front-fill me-1"></i> Drive with Us</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- DUAL PORTAL SELECTOR: CUSTOMER & DRIVER ONLY -->
+    <section class="py-3 bg-dark border-bottom border-secondary border-opacity-25 text-light">
+        <div class="container">
+            <div class="row g-3 align-items-center justify-content-between">
+                <div class="col-md-6 d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-warning text-dark p-2 text-center" style="width: 42px; height: 42px; line-height: 26px;">
+                        <i class="bi bi-person-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-white small">Riding with JhazTaxi?</div>
+                        <div class="text-white-50" style="font-size: 0.78rem;">Book cabs with transparent upfront fares and real-time tracking</div>
+                    </div>
+                    <a href="/login.html" class="btn btn-yellow btn-sm fw-bold ms-auto text-nowrap">Customer Portal</a>
+                </div>
+                <div class="col-md-6 d-flex align-items-center gap-3 border-start-md border-secondary border-opacity-25">
+                    <div class="rounded-circle bg-primary text-white p-2 text-center" style="width: 42px; height: 42px; line-height: 26px;">
+                        <i class="bi bi-car-front-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-white small">Own a cab? Drive & Earn</div>
+                        <div class="text-white-50" style="font-size: 0.78rem;">Join our fleet, view open rides pool, and grow your daily income</div>
+                    </div>
+                    <a href="/driver/login.html" class="btn btn-outline-warning btn-sm fw-bold ms-auto text-nowrap">Driver Portal</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. HERO & 3. QUICK BOOKING FORM -->
+    <header class="hero-section">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <div class="hero-tagline">
+                        <i class="bi bi-shield-check"></i> 100% Verified Drivers & Sanitized Cabs
+                    </div>
+                    <h1 class="hero-heading">
+                        Book Your Ride with <span>JhazTaxi</span>
+                    </h1>
+                    <p class="hero-subtext">
+                        Safe, Reliable and Affordable Taxi Booking at Your Fingertips. Experience effortless urban transit with transparent upfront pricing.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="/booking.html" class="btn btn-yellow btn-lg">
+                            <i class="bi bi-geo-alt-fill"></i> Book a Ride Now
+                        </a>
+                        <a href="/vehicles.html" class="btn btn-outline-yellow btn-lg">
+                            <i class="bi bi-car-front-fill"></i> View Vehicles
+                        </a>
+                    </div>
+                    <div class="d-flex align-items-center gap-4 mt-4 pt-3 border-top border-secondary text-white-50">
+                        <div><strong class="text-white fs-4">15k+</strong><br><small>Happy Riders</small></div>
+                        <div class="border-start border-secondary ps-4"><strong class="text-white fs-4">4.9★</strong><br><small>Service Rating</small></div>
+                        <div class="border-start border-secondary ps-4"><strong class="text-white fs-4">24/7</strong><br><small>Dispatch Support</small></div>
+                    </div>
+                </div>
+
+                <!-- 3. Prominent Booking Form Component -->
+                <div class="col-lg-6">
+                    <div class="hero-booking-card">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h4 class="mb-0 fw-bold">Plan Your Journey</h4>
+                            <span class="badge bg-warning text-dark"><i class="bi bi-lightning-charge-fill me-1"></i> Instant Fare</span>
+                        </div>
+                        <form action="/booking.html" method="GET">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-uppercase">Pickup Location</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-success"><i class="bi bi-circle-fill"></i></span>
+                                    <input type="text" name="pickup" class="form-control" placeholder="Enter pickup address, landmark or airport" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-uppercase">Drop Location</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-danger"><i class="bi bi-square-fill"></i></span>
+                                    <input type="text" name="drop" class="form-control" placeholder="Enter destination location" required>
+                                </div>
+                            </div>
+                            <div class="row g-2 mb-3">
+                                <div class="col-sm-6">
+                                    <label class="form-label small fw-bold text-uppercase">Vehicle Category</label>
+                                    <select name="vehicle" class="form-select">
+                                        <option value="Sedan" selected>Sedan (₹15/KM)</option>
+                                        <option value="Mini">Mini (₹12/KM)</option>
+                                        <option value="SUV">SUV (₹20/KM)</option>
+                                        <option value="Premium">Premium (₹25/KM)</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label small fw-bold text-uppercase">Passengers</label>
+                                    <select name="passengers" class="form-select">
+                                        <option value="1">1 Passenger</option>
+                                        <option value="2">2 Passengers</option>
+                                        <option value="3">3 Passengers</option>
+                                        <option value="4">4 Passengers</option>
+                                        <option value="5">5 Passengers (SUV)</option>
+                                        <option value="6">6 Passengers (SUV)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-yellow w-100 py-3 fw-bold fs-5">
+                                <i class="bi bi-calculator me-1"></i> Get Fare Estimate & Book Now
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 4. HOW JHAZTAXI WORKS -->
+    <section class="py-5 bg-white">
+        <div class="container py-4">
+            <div class="text-center max-w-700 mx-auto mb-5">
+                <span class="text-warning fw-bold text-uppercase tracking-wider">Simple 3-Step Process</span>
+                <h2 class="display-6 fw-bold mt-1">How JhazTaxi Works</h2>
+                <p class="text-muted">Effortless travel in just a few taps. From route discovery to your destination safely.</p>
+            </div>
+            <div class="row g-4 text-center">
+                <div class="col-md-4">
+                    <div class="jhaz-card h-100">
+                        <div class="step-number-badge mx-auto">1</div>
+                        <h4 class="fw-bold mb-3">Set Your Route</h4>
+                        <p class="text-muted">Input your pickup and destination on our interactive Leaflet map to calculate real road distance and travel time.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="jhaz-card h-100">
+                        <div class="step-number-badge mx-auto">2</div>
+                        <h4 class="fw-bold mb-3">Choose Your Ride</h4>
+                        <p class="text-muted">Select from Mini, Sedan, SUV, or Premium cabs with transparent, dynamic pricing. No surprise fees.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="jhaz-card h-100">
+                        <div class="step-number-badge mx-auto">3</div>
+                        <h4 class="fw-bold mb-3">Ride Comfortably</h4>
+                        <p class="text-muted">Your verified professional driver arrives promptly. Track trip milestones and pay via Cash or UPI.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. VEHICLE TYPES -->
+    <section class="py-5 bg-light">
+        <div class="container py-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-end mb-4">
+                <div>
+                    <span class="text-warning fw-bold text-uppercase">Fleet Overview</span>
+                    <h2 class="display-6 fw-bold mt-1">Our Vehicle Categories</h2>
+                </div>
+                <a href="/vehicles.html" class="btn btn-outline-dark fw-bold">Explore All Specs &rarr;</a>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="vehicle-card">
+                        <div class="vehicle-img-wrapper">
+                            <span class="vehicle-type-pill">Mini</span>
+                            <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80" alt="Mini Taxi">
+                        </div>
+                        <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between">
+                            <div>
+                                <h5 class="fw-bold mb-1">Hyundai Grand i10</h5>
+                                <div class="text-muted small mb-2"><i class="bi bi-people-fill me-1"></i> Up to 4 Passengers</div>
+                                <p class="text-muted small">Compact, pocket-friendly rides for brisk city travels.</p>
+                            </div>
+                            <div class="border-top pt-2 d-flex justify-content-between align-items-center">
+                                <div><strong class="text-dark fs-5">₹12</strong><span class="text-muted small">/KM</span></div>
+                                <a href="/booking.html?vehicle=Mini" class="btn btn-sm btn-yellow fw-bold">Select</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="vehicle-card">
+                        <div class="vehicle-img-wrapper">
+                            <span class="vehicle-type-pill">Sedan</span>
+                            <img src="https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=600&q=80" alt="Sedan Taxi">
+                        </div>
+                        <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between">
+                            <div>
+                                <h5 class="fw-bold mb-1">Honda City Deluxe</h5>
+                                <div class="text-muted small mb-2"><i class="bi bi-people-fill me-1"></i> Up to 4 Passengers</div>
+                                <p class="text-muted small">Spacious boots, air-conditioned comfort, ideal for daily office commutes.</p>
+                            </div>
+                            <div class="border-top pt-2 d-flex justify-content-between align-items-center">
+                                <div><strong class="text-dark fs-5">₹15</strong><span class="text-muted small">/KM</span></div>
+                                <a href="/booking.html?vehicle=Sedan" class="btn btn-sm btn-yellow fw-bold">Select</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="vehicle-card">
+                        <div class="vehicle-img-wrapper">
+                            <span class="vehicle-type-pill">SUV</span>
+                            <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80" alt="SUV Taxi">
+                        </div>
+                        <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between">
+                            <div>
+                                <h5 class="fw-bold mb-1">Toyota Innova Crysta</h5>
+                                <div class="text-muted small mb-2"><i class="bi bi-people-fill me-1"></i> Up to 6 Passengers</div>
+                                <p class="text-muted small">Large family outings, heavy luggage, and airport transit capacity.</p>
+                            </div>
+                            <div class="border-top pt-2 d-flex justify-content-between align-items-center">
+                                <div><strong class="text-dark fs-5">₹20</strong><span class="text-muted small">/KM</span></div>
+                                <a href="/booking.html?vehicle=SUV" class="btn btn-sm btn-yellow fw-bold">Select</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="vehicle-card">
+                        <div class="vehicle-img-wrapper">
+                            <span class="vehicle-type-pill">Premium</span>
+                            <img src="https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=600&q=80" alt="Premium Taxi">
+                        </div>
+                        <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between">
+                            <div>
+                                <h5 class="fw-bold mb-1">Mercedes E-Class</h5>
+                                <div class="text-muted small mb-2"><i class="bi bi-people-fill me-1"></i> Up to 4 Passengers</div>
+                                <p class="text-muted small">Executive luxury travel, plush leather seating, and top-rated chauffeurs.</p>
+                            </div>
+                            <div class="border-top pt-2 d-flex justify-content-between align-items-center">
+                                <div><strong class="text-dark fs-5">₹25</strong><span class="text-muted small">/KM</span></div>
+                                <a href="/booking.html?vehicle=Premium" class="btn btn-sm btn-yellow fw-bold">Select</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. WHY CHOOSE JHAZTAXI -->
+    <section class="py-5 bg-white">
+        <div class="container py-4">
+            <div class="text-center max-w-700 mx-auto mb-5">
+                <span class="text-warning fw-bold text-uppercase">The JhazTaxi Difference</span>
+                <h2 class="display-6 fw-bold mt-1">Why Choose JhazTaxi?</h2>
+                <p class="text-muted">Built for commuters who value punctuality, absolute safety, and straightforward billing.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="jhaz-card h-100">
+                        <div class="stat-icon yellow mb-3"><i class="bi bi-calculator-fill"></i></div>
+                        <h5 class="fw-bold">Dynamic Upfront Fares</h5>
+                        <p class="text-muted small mb-0">Our backend calculates precise road distance with zero hidden surcharges or surge gouging.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="jhaz-card h-100">
+                        <div class="stat-icon green mb-3"><i class="bi bi-patch-check-fill"></i></div>
+                        <h5 class="fw-bold">Vetted & Licensed Drivers</h5>
+                        <p class="text-muted small mb-0">Kumar, Suresh, Arun, Mohammed and our entire crew have verified licenses and high user ratings.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="jhaz-card h-100">
+                        <div class="stat-icon blue mb-3"><i class="bi bi-map-fill"></i></div>
+                        <h5 class="fw-bold">Real Road Navigation</h5>
+                        <p class="text-muted small mb-0">Powered by OpenStreetMap and OSRM routing algorithms for optimal, traffic-aware journeys.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="jhaz-card h-100">
+                        <div class="stat-icon red mb-3"><i class="bi bi-headset"></i></div>
+                        <h5 class="fw-bold">24/7 Priority Support</h5>
+                        <p class="text-muted small mb-0">Direct administrator hotline and real-time ride tracking for complete peace of mind.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. POPULAR ROUTES -->
+    <section class="py-5 bg-light">
+        <div class="container py-4">
+            <div class="text-center max-w-700 mx-auto mb-5">
+                <span class="text-warning fw-bold text-uppercase">Frequent Destinations</span>
+                <h2 class="display-6 fw-bold mt-1">Popular City Routes</h2>
+                <p class="text-muted">Quick links to our most booked destinations with fixed competitive estimates.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-dark text-warning">Airport Express</span>
+                            <span class="text-muted small">~35 KM</span>
+                        </div>
+                        <h5 class="fw-bold mb-1">City Center &harr; International Airport</h5>
+                        <p class="text-muted small">On-time guaranteed airport drops and arrivals pickup.</p>
+                        <a href="/booking.html?pickup=MG+Road+Metro&drop=Kempegowda+International+Airport" class="btn btn-outline-dark btn-sm mt-auto fw-bold">Book This Route &rarr;</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-dark text-warning">IT Corridor</span>
+                            <span class="text-muted small">~18 KM</span>
+                        </div>
+                        <h5 class="fw-bold mb-1">Indiranagar &harr; Whitefield Tech Park</h5>
+                        <p class="text-muted small">Seamless daily office commutes with comfortable sedans.</p>
+                        <a href="/booking.html?pickup=Indiranagar&drop=Whitefield" class="btn btn-outline-dark btn-sm mt-auto fw-bold">Book This Route &rarr;</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-dark text-warning">City Transit</span>
+                            <span class="text-muted small">~8 KM</span>
+                        </div>
+                        <h5 class="fw-bold mb-1">Koramangala &harr; Brigade Road</h5>
+                        <p class="text-muted small">Quick shopping, dining, and weekend nightlife city hops.</p>
+                        <a href="/booking.html?pickup=Koramangala&drop=Brigade+Road" class="btn btn-outline-dark btn-sm mt-auto fw-bold">Book This Route &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. SAFETY SECTION -->
+    <section class="py-5 bg-dark text-white">
+        <div class="container py-4">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="text-warning fw-bold text-uppercase">Safety Protocol</span>
+                    <h2 class="display-6 fw-bold mt-1 text-white">Your Safety is Our Non-Negotiable Priority</h2>
+                    <p class="text-white-50">Every JhazTaxi trip is backed by multi-tier passenger protection protocols designed to keep you and your loved ones safe at all hours.</p>
+                    <ul class="list-unstyled mt-4 d-flex flex-column gap-3">
+                        <li class="d-flex align-items-start gap-3">
+                            <i class="bi bi-shield-lock-fill text-warning fs-4"></i>
+                            <div><strong>Live Milestone Tracking:</strong> Real-time status updates from driver assignment to trip completion.</div>
+                        </li>
+                        <li class="d-flex align-items-start gap-3">
+                            <i class="bi bi-person-badge-fill text-warning fs-4"></i>
+                            <div><strong>Driver Background Verification:</strong> Complete identification, driving license records, and continuous rating audits.</div>
+                        </li>
+                        <li class="d-flex align-items-start gap-3">
+                            <i class="bi bi-cash-coin text-warning fs-4"></i>
+                            <div><strong>Secure Payment Architecture:</strong> Pay with Cash on Ride or direct UPI with zero card storage vulnerabilities.</div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=700&q=80" class="img-fluid rounded-4 shadow-lg border border-secondary" alt="Safe Taxi Travel">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. CUSTOMER REVIEWS -->
+    <section class="py-5 bg-white">
+        <div class="container py-4">
+            <div class="text-center max-w-700 mx-auto mb-5">
+                <span class="text-warning fw-bold text-uppercase">Rider Stories</span>
+                <h2 class="display-6 fw-bold mt-1">What Our Riders Say</h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="jhaz-card h-100">
+                        <div class="rating-stars mb-2">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="text-muted fst-italic">"Driver Kumar was right on time at 4:30 AM for my flight. The sedan was immaculate and the fare matched the estimate to the rupee. Outstanding service!"</p>
+                        <div class="d-flex align-items-center gap-3 mt-3 pt-3 border-top">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" alt="Priya Natarajan - Happy JhazTaxi Customer" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                            <div>
+                                <h6 class="mb-0 fw-bold">Priya Natarajan</h6>
+                                <small class="text-muted">Airport Commuter</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="jhaz-card h-100">
+                        <div class="rating-stars mb-2">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="text-muted fst-italic">"The interactive map and instant pricing make JhazTaxi my top choice. No driver cancellations or surge surprises like other apps."</p>
+                        <div class="d-flex align-items-center gap-3 mt-3 pt-3 border-top">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&q=80" alt="Amit Deshmukh - Happy JhazTaxi Customer" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                            <div>
+                                <h6 class="mb-0 fw-bold">Amit Deshmukh</h6>
+                                <small class="text-muted">Tech Lead</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="jhaz-card h-100">
+                        <div class="rating-stars mb-2">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="text-muted fst-italic">"Booked an Innova SUV for our 6-member family trip. Driver Arun was extremely courteous and drove with utmost care."</p>
+                        <div class="d-flex align-items-center gap-3 mt-3 pt-3 border-top">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&q=80" alt="Dr. Joseph Thomas - Happy JhazTaxi Customer" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                            <div>
+                                <h6 class="mb-0 fw-bold">Dr. Joseph Thomas</h6>
+                                <small class="text-muted">Family Traveler</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. FAQ SECTION -->
+    <section class="py-5 bg-light">
+        <div class="container py-4 max-w-800 mx-auto">
+            <div class="text-center mb-5">
+                <span class="text-warning fw-bold text-uppercase">Got Questions?</span>
+                <h2 class="display-6 fw-bold mt-1">Frequently Asked Questions</h2>
+            </div>
+            <div class="accordion shadow-sm" id="jhazFaqAccordion">
+                <div class="accordion-item border-0 mb-2 rounded overflow-hidden">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                            How is the trip fare calculated?
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#jhazFaqAccordion">
+                        <div class="accordion-body text-muted">
+                            Fares are computed automatically using: <code>Base Fare + (Road Distance × Price Per KM) + Night Surcharge (if 10 PM - 6 AM) + Extra Passenger Surcharge</code>. Fares are dynamic and pulled directly from our database.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item border-0 mb-2 rounded overflow-hidden">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                            What payment methods are supported?
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#jhazFaqAccordion">
+                        <div class="accordion-body text-muted">
+                            We currently support Cash on Ride and UPI payment. Future support for Razorpay and Stripe cards is in progress.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item border-0 mb-2 rounded overflow-hidden">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                            Can I cancel my booking if my plans change?
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#jhazFaqAccordion">
+                        <div class="accordion-body text-muted">
+                            Yes! You can cancel any booking directly from your customer dashboard as long as the trip has not yet completed.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item border-0 rounded overflow-hidden">
+                    <h2 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                            How do I get driver details after booking?
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#jhazFaqAccordion">
+                        <div class="accordion-body text-muted">
+                            Once our dispatch administration assigns an available driver, your ride details page automatically updates with the driver's name, direct phone number, vehicle registration number, and photo.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. CALL TO ACTION -->
+    <section class="py-5" style="background: linear-gradient(135deg, #121212 0%, #2A2A2A 100%);">
+        <div class="container py-4 text-center text-white">
+            <h2 class="display-5 fw-bold mb-3">Ready to Ride with <span class="text-warning">JhazTaxi</span>?</h2>
+            <p class="lead text-white-50 max-w-700 mx-auto mb-4">Book your cab in under 60 seconds with live road distance estimation and professional drivers.</p>
+            <a href="/booking.html" class="btn btn-yellow btn-lg px-5 py-3 fw-bold fs-5 shadow">
+                <i class="bi bi-geo-alt-fill me-2"></i> Book Your Ride Now
+            </a>
+        </div>
+    </section>
+
+    <!-- 12. FOOTER -->
+    <footer class="footer-jhaz">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="brand-badge">JH</span>
+                        <span class="fs-4 fw-bold text-white">JhazTaxi</span>
+                    </div>
+                    <p class="small text-muted mb-3">"Your Ride, Your Way." Professional, safe, and dependable taxi booking platform built for modern urban transportation.</p>
+                    <div class="d-flex gap-3 text-warning fs-5">
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h5>Quick Links</h5>
+                    <a href="/index.html">Home</a>
+                    <a href="/booking.html">Book a Ride</a>
+                    <a href="/vehicles.html">Vehicles</a>
+                    <a href="/about.html">About Us</a>
+                    <a href="/contact.html">Contact</a>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h5>Portals</h5>
+                    <a href="/login.html">Customer Login</a>
+                    <a href="/register.html">Customer Register</a>
+                    <a href="/driver/login.html">Driver Sign In</a>
+                    <a href="/driver/register.html">Join as Driver</a>
+                </div>
+                <div class="col-lg-4">
+                    <h5>Dispatch & Support</h5>
+                    <p class="small mb-1"><i class="bi bi-telephone-fill text-warning me-2"></i> 24/7 Helpline: +91 80000 12345</p>
+                    <p class="small mb-1"><i class="bi bi-envelope-fill text-warning me-2"></i> support@jhaztaxi.com</p>
+                    <p class="small mb-1"><i class="bi bi-geo-alt-fill text-warning me-2"></i> MG Road, Indiranagar, Bengaluru, India</p>
+                </div>
+            </div>
+            <div class="footer-bottom d-flex flex-wrap justify-content-between align-items-center">
+                <div>&copy; <span id="current-year">2026</span> JhazTaxi. All rights reserved.</div>
+                <div class="small text-muted">Powered by Django REST Framework & Leaflet Maps</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Roster & Fleet - JhazTaxi Admin</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-header d-flex align-items-center gap-2">
+                <span class="brand-badge">JH</span>
+                <span class="fs-5 fw-bold text-white">JhazTaxi Admin</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/admin/dashboard.html" class="admin-nav-item"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                <a href="/admin/bookings.html" class="admin-nav-item"><i class="bi bi-journal-text"></i> Bookings</a>
+                <a href="/admin/driver-requests.html" class="admin-nav-item"><i class="bi bi-send-check"></i> Driver Requests</a>
+                <a href="/admin/drivers.html" class="admin-nav-item active"><i class="bi bi-person-badge"></i> Drivers</a>
+                <a href="/admin/vehicles.html" class="admin-nav-item"><i class="bi bi-car-front"></i> Vehicles</a>
+                <a href="/admin/customers.html" class="admin-nav-item"><i class="bi bi-people"></i> Customers</a>
+                <a href="/admin/fares.html" class="admin-nav-item"><i class="bi bi-currency-rupee"></i> Fare Settings</a>
+                <a href="/admin/map.html" class="admin-nav-item"><i class="bi bi-map"></i> Dispatch Map</a>
+                <a href="/admin/payments.html" class="admin-nav-item"><i class="bi bi-credit-card"></i> Payments</a>
+                <a href="/admin/reviews.html" class="admin-nav-item"><i class="bi bi-star"></i> Reviews</a>
+                <a href="/admin/reports.html" class="admin-nav-item"><i class="bi bi-bar-chart-line"></i> Reports</a>
+                <hr class="border-secondary my-3">
+                <a href="/index.html" class="admin-nav-item" target="_blank"><i class="bi bi-box-arrow-up-right"></i> Customer Site</a>
+                <a href="javascript:void(0)" onclick="handleGlobalLogout()" class="admin-nav-item text-danger"><i class="bi bi-box-arrow-right"></i> Sign Out</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <div>
+                    <h5 class="mb-0 fw-bold">Driver Roster & Fleet</h5>
+                    <small class="text-muted">Manage driver profiles, vehicle plates, driver photos, and car pictures</small>
+                </div>
+                <button class="btn btn-yellow btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addDriverModal">
+                    <i class="bi bi-person-plus-fill me-1"></i> + Register New Driver
+                </button>
+            </header>
+
+            <div class="admin-content-area">
+                <div class="admin-table-card">
+                    <div class="admin-table-header d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-0">Registered Drivers & Attached Cars</h6>
+                        <span class="badge bg-light text-dark border">Driver Photo & Car Photo Compulsory</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table admin-table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Driver Photo & Name</th>
+                                    <th>Mobile Number <span class="badge bg-danger text-white ms-1" style="font-size: 0.65rem;">Required</span></th>
+                                    <th>Email <span class="badge bg-secondary ms-1" style="font-size: 0.65rem;">Optional</span></th>
+                                    <th>Car Photo & Plate <span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;">Compulsory</span></th>
+                                    <th>License</th>
+                                    <th>Rating</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-drivers-tbody">
+                                <tr><td colspan="8" class="text-center py-4"><span class="spinner-border spinner-yellow"></span> Loading drivers...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal: Add Driver -->
+    <div class="modal fade" id="addDriverModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header border-bottom bg-dark text-light">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-person-plus-fill text-warning me-2"></i>Register New Driver</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form onsubmit="handleAddDriver(event)">
+                    <div class="modal-body p-4">
+
+                        <!-- Full Name & Mobile & Email -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-5">
+                                <label class="form-label small fw-bold text-uppercase">Full Name *</label>
+                                <input type="text" name="name" class="form-control" placeholder="e.g. Ramesh Kumar" required>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label small fw-bold text-uppercase text-danger">
+                                    <i class="bi bi-telephone-fill me-1"></i> Mobile Number * (Required)
+                                </label>
+                                <input type="tel" name="phone" class="form-control" placeholder="+91 98450 12345" required>
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted">
+                                    <i class="bi bi-envelope me-1"></i> Email (Optional)
+                                </label>
+                                <input type="email" name="email" class="form-control" placeholder="driver@example.com">
+                            </div>
+                        </div>
+
+                        <!-- Compulsory Photos: Driver Picture & Car Picture -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <label class="form-label small fw-bold text-uppercase text-danger d-block">
+                                        <i class="bi bi-person-bounding-box me-1 text-primary"></i> Driver Profile Picture * (Compulsory)
+                                    </label>
+                                    <input type="file" name="profile_image" id="driver-profile-input" class="form-control form-control-sm" accept="image/*" required onchange="previewDriverPhoto(this)">
+                                    <div id="driver-photo-preview" class="mt-2 text-center d-none">
+                                        <img id="driver-photo-img" src="" alt="Driver" class="rounded-circle border shadow-sm" style="width: 72px; height: 72px; object-fit: cover;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <label class="form-label small fw-bold text-uppercase text-danger d-block">
+                                        <i class="bi bi-car-front-fill me-1 text-warning"></i> Car Picture * (Compulsory)
+                                    </label>
+                                    <input type="file" name="car_image" id="driver-car-input" class="form-control form-control-sm" accept="image/*" required onchange="previewCarPhoto(this)">
+                                    <div id="driver-car-preview" class="mt-2 text-center d-none">
+                                        <img id="driver-car-img" src="" alt="Car" class="rounded border shadow-sm" style="height: 72px; width: 100%; object-fit: cover;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vehicle Plate Number (Compulsory) & Vehicle Type & License -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-4">
+                                <label class="form-label small fw-bold text-uppercase text-danger">
+                                    <i class="bi bi-123 me-1"></i> Vehicle Plate No. * (Compulsory)
+                                </label>
+                                <input type="text" name="vehicle_number" class="form-control fw-bold" placeholder="KA-05-AB-9999" required>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label small fw-bold text-uppercase">Vehicle Type</label>
+                                <select name="vehicle_type" class="form-select">
+                                    <option value="Sedan" selected>Sedan</option>
+                                    <option value="Mini">Mini (Hatchback)</option>
+                                    <option value="SUV">SUV (Innova)</option>
+                                    <option value="Premium">Premium Luxury</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label small fw-bold text-uppercase">Driving License Number *</label>
+                                <input type="text" name="license_number" class="form-control" placeholder="DL-KA-2023-XXXXX" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold text-uppercase">Residential Address (Optional)</label>
+                            <textarea name="address" class="form-control" rows="2" placeholder="Driver address..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top bg-light">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" id="btn-save-driver" class="btn btn-yellow btn-sm fw-bold">
+                            <i class="bi bi-check-circle-fill me-1"></i> Register Driver & Car
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAdminDrivers();
+        });
+
+        function previewDriverPhoto(input) {
+            const preview = document.getElementById('driver-photo-preview');
+            const img = document.getElementById('driver-photo-img');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    img.src = e.target.result;
+                    preview.classList.remove('d-none');
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.classList.add('d-none');
+            }
+        }
+
+        function previewCarPhoto(input) {
+            const preview = document.getElementById('driver-car-preview');
+            const img = document.getElementById('driver-car-img');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    img.src = e.target.result;
+                    preview.classList.remove('d-none');
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.classList.add('d-none');
+            }
+        }
+    </script>
+</body>
+</html>

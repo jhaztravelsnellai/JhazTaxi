@@ -1,0 +1,237 @@
+/* ========================================================
+   JhazTaxi - Booking Page Specific CSS
+   ======================================================== */
+
+.booking-container {
+    padding: 40px 0 80px;
+}
+
+/* Map Container */
+.map-card {
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    border: 1px solid var(--light-border);
+    position: relative;
+}
+
+#booking-map {
+    height: 480px;
+    width: 100%;
+    z-index: 1;
+}
+
+.map-status-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: rgba(18, 18, 18, 0.88);
+    backdrop-filter: blur(8px);
+    color: #FFFFFF;
+    padding: 14px 20px;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 193, 7, 0.4);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.95rem;
+}
+
+/* Location input styling */
+.location-input-group {
+    position: relative;
+}
+
+.location-input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    z-index: 10;
+}
+
+.location-input-icon.pickup {
+    color: #10B981;
+}
+
+.location-input-icon.drop {
+    color: #EF4444;
+}
+
+.form-control-location {
+    padding-left: 42px !important;
+    padding-right: 46px !important;
+    height: 52px;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--light-border);
+    font-weight: 500;
+}
+
+.form-control-location:focus {
+    border-color: var(--primary-yellow);
+    box-shadow: 0 0 0 4px var(--primary-yellow-glow);
+}
+
+.btn-locate {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.2s;
+}
+
+.btn-locate:hover {
+    color: var(--primary-yellow-hover);
+}
+
+/* Suggestions dropdown */
+.location-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    border: 1px solid var(--light-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-hover);
+    z-index: 1050;
+    max-height: 220px;
+    overflow-y: auto;
+    display: none;
+}
+
+.suggestion-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #F3F4F6;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.suggestion-item:hover {
+    background-color: var(--primary-yellow-light);
+}
+
+/* Vehicle Selection Cards */
+.vehicle-select-item {
+    background: #FFFFFF;
+    border: 2px solid var(--light-border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.vehicle-select-item:hover {
+    border-color: #CBD5E1;
+    transform: translateY(-2px);
+}
+
+.vehicle-select-item.selected {
+    border-color: var(--primary-yellow);
+    background-color: var(--primary-yellow-light);
+    box-shadow: 0 4px 12px var(--primary-yellow-glow);
+}
+
+.vehicle-thumb {
+    width: 65px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+}
+
+.fare-breakdown-card {
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--light-border);
+    box-shadow: var(--shadow-card);
+    padding: 24px;
+}
+
+.fare-total-highlight {
+    background: linear-gradient(135deg, #121212 0%, #222222 100%);
+    color: #FFFFFF;
+    padding: 18px;
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--primary-yellow);
+}
+
+.fare-total-highlight .total-price {
+    color: var(--primary-yellow);
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+/* Booking steps wizard */
+.booking-steps-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.booking-steps-nav::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 40px;
+    right: 40px;
+    height: 3px;
+    background: var(--light-border);
+    z-index: 1;
+}
+
+.step-indicator {
+    position: relative;
+    z-index: 2;
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.step-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #F3F4F6;
+    border: 2px solid var(--light-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.step-indicator.active .step-circle {
+    background: var(--primary-yellow);
+    border-color: #000000;
+    color: #000000;
+    box-shadow: 0 0 0 5px var(--primary-yellow-glow);
+}
+
+.step-indicator.completed .step-circle {
+    background: #10B981;
+    border-color: #10B981;
+    color: #FFFFFF;
+}

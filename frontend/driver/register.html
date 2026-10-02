@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Partner Registration - Register Your Cab & Drive | JhazTaxi</title>
+    <meta name="description" content="Register as a verified JhazTaxi driver partner. Upload driver photo, car picture, vehicle details, and start taking booking requests to earn daily.">
+    <meta name="keywords" content="drive with taxi, cab driver registration, driver partner, attach car with taxi, earn driving cab, JhazTaxi driver registration">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jhaztaxi.com/driver/register.html">
+
+    <!-- Favicon & PWA -->
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#FFC107">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jhaztaxi.com/driver/register.html">
+    <meta property="og:site_name" content="JhazTaxi">
+    <meta property="og:title" content="Driver Partner Registration | JhazTaxi Fleet">
+    <meta property="og:description" content="Register your cab and join JhazTaxi fleet. Flexible hours, transparent commission, and instant passenger ride requests.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Driver Partner Registration | JhazTaxi">
+    <meta name="twitter:description" content="Join JhazTaxi fleet as a verified driver partner. Sign up with your vehicle today.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80">
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Driver Partner Registration",
+      "url": "https://jhaztaxi.com/driver/register.html",
+      "description": "Register as a verified JhazTaxi driver partner."
+    }
+    </script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/config.js"></script>
+    <script>
+        (function() {
+            const token = getAuthToken();
+            const user = getCurrentUser();
+            if (token && user && user.role === 'driver') {
+                window.location.replace('/driver/dashboard.html');
+            }
+        })();
+    </script>
+</head>
+<body style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); min-height: 100vh; display: flex; flex-direction: column;">
+
+    <!-- TOP BAR -->
+    <nav class="navbar navbar-dark navbar-jhaz border-bottom border-secondary border-opacity-25">
+        <div class="container">
+            <a class="navbar-brand navbar-brand-jhaz d-flex align-items-center gap-2" href="/index.html">
+                <span class="brand-badge bg-warning text-dark fw-bold">JH</span>
+                <span class="text-white">JhazTaxi <span class="badge bg-warning text-dark font-monospace" style="font-size: 0.7rem;">DRIVER PARTNER</span></span>
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                <a href="/driver/login.html" class="btn btn-outline-warning btn-sm fw-bold">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Driver Sign In
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- REGISTRATION CONTAINER -->
+    <div class="container py-5 my-auto">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white">
+                    <div class="text-center mb-4">
+                        <div class="rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center mb-3 shadow" style="width: 60px; height: 60px;">
+                            <i class="bi bi-person-badge-fill fs-2"></i>
+                        </div>
+                        <h1 class="h3 fw-bold mb-1 text-dark">Driver Partner Registration</h1>
+                        <p class="text-muted small">Register your vehicle, upload compulsory photos & start accepting rides</p>
+                    </div>
+
+                    <form onsubmit="handleDriverRegister(event)" enctype="multipart/form-data">
+                        
+                        <!-- 1. PERSONAL INFORMATION -->
+                        <h6 class="fw-bold text-uppercase text-secondary mb-3 pb-2 border-bottom">
+                            <i class="bi bi-person-fill text-primary me-1"></i> Personal Details
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-uppercase">Full Name * (Required)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                                    <input type="text" name="name" class="form-control" placeholder="e.g. Ramesh Kumar" required autofocus>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-uppercase text-danger">
+                                    <i class="bi bi-telephone-fill me-1"></i> Mobile Phone Number * (Required)
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="bi bi-telephone text-primary"></i></span>
+                                    <input type="tel" name="phone" class="form-control" placeholder="+91 98450 12345" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-uppercase text-muted">
+                                    <i class="bi bi-envelope me-1"></i> Email Address (Optional)
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                                    <input type="email" name="email" class="form-control" placeholder="driver@example.com (Optional)">
+                                </div>
+                                <div class="form-text small text-muted">Leave blank if you don't have an email; you can sign in with your mobile number.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-uppercase">Driving License Number * (Required)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="bi bi-card-text"></i></span>
+                                    <input type="text" name="license_number" class="form-control" placeholder="DL-KA-2023-XXXXX" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. COMPULSORY PHOTOGRAPHS -->
+                        <h6 class="fw-bold text-uppercase text-secondary mb-3 pb-2 border-bottom">
+                            <i class="bi bi-camera-fill text-warning me-1"></i> Compulsory Verification Photographs
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <!-- Driver Profile Photo -->
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light text-center h-100">
+                                    <label class="form-label small fw-bold text-uppercase text-danger d-block mb-2">
+                                        <i class="bi bi-person-bounding-box me-1 text-primary"></i> Driver Profile Picture * (Compulsory)
+                                    </label>
+                                    <input type="file" name="profile_image" id="reg-driver-photo" class="form-control form-control-sm" accept="image/*" required onchange="previewRegDriverPhoto(this)">
+                                    <div id="reg-driver-photo-preview" class="mt-3 d-none">
+                                        <img id="reg-driver-photo-img" src="" alt="Driver Preview" class="rounded-circle border border-warning shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
+                                        <div class="small text-success mt-1 fw-bold"><i class="bi bi-check-circle-fill me-1"></i> Driver Photo Selected</div>
+                                    </div>
+                                    <div class="small text-muted mt-2">Clear portrait photo of driver face.</div>
+                                </div>
+                            </div>
+
+                            <!-- Car Photo -->
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light text-center h-100">
+                                    <label class="form-label small fw-bold text-uppercase text-danger d-block mb-2">
+                                        <i class="bi bi-car-front-fill me-1 text-warning"></i> Car Picture * (Compulsory)
+                                    </label>
+                                    <input type="file" name="car_image" id="reg-car-photo" class="form-control form-control-sm" accept="image/*" required onchange="previewRegCarPhoto(this)">
+                                    <div id="reg-car-photo-preview" class="mt-3 d-none">
+                                        <img id="reg-car-photo-img" src="" alt="Car Preview" class="rounded border border-warning shadow-sm" style="width: 100%; height: 80px; object-fit: cover;">
+                                        <div class="small text-success mt-1 fw-bold"><i class="bi bi-check-circle-fill me-1"></i> Car Photo Selected</div>
+                                    </div>
+                                    <div class="small text-muted mt-2">Clear front or side picture of your taxi cab.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. VEHICLE SPECIFICATIONS -->
+                        <h6 class="fw-bold text-uppercase text-secondary mb-3 pb-2 border-bottom">
+                            <i class="bi bi-speedometer2 text-danger me-1"></i> Vehicle Specifications
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-uppercase text-danger">
+                                    <i class="bi bi-123 me-1"></i> Vehicle Plate Number * (Compulsory)
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="bi bi-card-heading"></i></span>
+                                    <input type="text" name="vehicle_number" class="form-control fw-bold font-monospace" placeholder="e.g. KA-05-MB-1234" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-uppercase">Vehicle Category * (Required)</label>
+                                <select name="vehicle_type" class="form-select">
+                                    <option value="Sedan" selected>Sedan (Dzire, Etios, Amaze)</option>
+                                    <option value="Mini">Mini / Hatchback (WagonR, Swift)</option>
+                                    <option value="SUV">SUV (Innova, Ertiga)</option>
+                                    <option value="Premium">Premium Luxury (Camry, Audi)</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Residential Address (Optional)</label>
+                                <input type="text" name="address" class="form-control" placeholder="Street, Area, City">
+                            </div>
+                        </div>
+
+                        <!-- 4. ACCOUNT PASSWORD -->
+                        <h6 class="fw-bold text-uppercase text-secondary mb-3 pb-2 border-bottom">
+                            <i class="bi bi-lock-fill text-success me-1"></i> Account Security
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-uppercase">Password * (Min. 6 chars)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                                    <input type="password" name="password" class="form-control" placeholder="Create strong password" minlength="6" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-uppercase">Confirm Password *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="bi bi-shield-check"></i></span>
+                                    <input type="password" name="confirm_password" class="form-control" placeholder="Re-enter password" minlength="6" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4 small text-muted">
+                            <input class="form-check-input" type="checkbox" id="driverTerms" required checked>
+                            <label class="form-check-label" for="driverTerms">
+                                I confirm that all submitted driver and vehicle photos and documents are valid and original.
+                            </label>
+                        </div>
+
+                        <button type="submit" id="btn-submit-driver-reg" class="btn btn-warning text-dark w-100 py-3 fw-bold fs-6 mb-3 shadow">
+                            <i class="bi bi-check-circle-fill me-1"></i> Register as Driver Partner
+                        </button>
+                    </form>
+
+                    <div class="text-center pt-3 border-top small">
+                        <span class="text-muted">Already registered as a driver?</span>
+                        <a href="/driver/login.html" class="fw-bold text-dark text-decoration-underline ms-1">
+                            Sign In to Driver Portal &rarr;
+                        </a>
+                    </div>
+
+                    <div class="text-center mt-3 pt-2 text-muted small">
+                        <span>Passenger looking to book a ride?</span>
+                        <a href="/register.html" class="text-primary fw-bold text-decoration-none ms-1">Customer Sign Up</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="py-3 text-center text-white-50 small mt-auto border-top border-secondary border-opacity-25">
+        <div class="container">
+            &copy; 2026 JhazTaxi &bull; Dedicated Driver Fleet Operations
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        function previewRegDriverPhoto(input) {
+            const preview = document.getElementById('reg-driver-photo-preview');
+            const img = document.getElementById('reg-driver-photo-img');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    img.src = e.target.result;
+                    preview.classList.remove('d-none');
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.classList.add('d-none');
+            }
+        }
+
+        function previewRegCarPhoto(input) {
+            const preview = document.getElementById('reg-car-photo-preview');
+            const img = document.getElementById('reg-car-photo-img');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    img.src = e.target.result;
+                    preview.classList.remove('d-none');
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.classList.add('d-none');
+            }
+        }
+    </script>
+</body>
+</html>

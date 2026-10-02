@@ -1,0 +1,21 @@
+{
+  "name": "JhazTaxi - Premium Urban Taxi Booking",
+  "short_name": "JhazTaxi",
+  "description": "Safe, reliable, and affordable taxi booking with instant upfront fare calculation and real-time cab tracking.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0F172A",
+  "theme_color": "#FFC107",
+  "icons": [
+    {
+      "src": "/assets/icons/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/assets/icons/logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

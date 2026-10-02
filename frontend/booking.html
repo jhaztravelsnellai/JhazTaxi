@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Taxi Online - Instant Fare & Real-Time Map | JhazTaxi</title>
+    <meta name="description" content="Book your taxi online with JhazTaxi. Interactive GPS map routing, exact road distance calculation, instant transparent fare estimates, and verified professional drivers.">
+    <meta name="keywords" content="book taxi online, instant cab booking, airport taxi, sedan cab, SUV taxi, fare estimate, JhazTaxi booking">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jhaztaxi.com/booking.html">
+
+    <!-- Favicon & PWA -->
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#FFC107">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jhaztaxi.com/booking.html">
+    <meta property="og:site_name" content="JhazTaxi">
+    <meta property="og:title" content="Book a Taxi Online - Instant Fare & Real-Time Map | JhazTaxi">
+    <meta property="og:description" content="Interactive map booking with real road distance calculation, vehicle category selection, and instant fare calculation.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Book a Taxi Online - Instant Fare & Real-Time Map | JhazTaxi">
+    <meta name="twitter:description" content="Calculate upfront fares and book your ride across town or outstation with JhazTaxi.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80">
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Book a Taxi Online",
+      "url": "https://jhaztaxi.com/booking.html",
+      "description": "Interactive map booking with real road distance calculation, vehicle category selection, and instant fare calculation.",
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://jhaztaxi.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Book a Ride",
+            "item": "https://jhaztaxi.com/booking.html"
+          }
+        ]
+      }
+    }
+    </script>
+
+    <!-- Bootstrap 5 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Leaflet.js Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/booking.css">
+
+    <script src="/js/config.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        requireAuth();
+    </script>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-jhaz sticky-top">
+        <div class="container">
+            <a class="navbar-brand navbar-brand-jhaz" href="/index.html">
+                <span class="brand-badge">JH</span>
+                <span>JhazTaxi</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item"><a class="nav-link nav-link-jhaz" href="/index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-jhaz active" href="/booking.html">Book a Ride</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-jhaz" href="/vehicles.html">Vehicles</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-jhaz" href="/about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-jhaz" href="/contact.html">Contact</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-2" id="navbar-auth-section">
+                    <a href="/login.html" class="btn btn-outline-yellow btn-sm">Login</a>
+                    <a href="/register.html" class="btn btn-yellow btn-sm">Register</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN BOOKING WORKFLOW -->
+    <main class="booking-container">
+        <div class="container">
+            <div class="text-center mb-4">
+                <h1 class="display-6 fw-bold">Book Your Ride in Minutes</h1>
+                <p class="text-muted">Enter locations, verify road route, select vehicle, and confirm your taxi.</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Left: Route Form & Vehicle Selection -->
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm p-4 rounded-4 mb-4">
+                        <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                            <span class="badge bg-warning text-dark">Step 1</span> Route & Schedule
+                        </h5>
+
+                        <!-- Pickup Location -->
+                        <div class="mb-3 location-input-group">
+                            <label class="form-label small fw-bold text-uppercase">Pickup Location</label>
+                            <i class="bi bi-geo-alt-fill location-input-icon pickup"></i>
+                            <input type="text" id="pickup-address" class="form-control form-control-location" placeholder="Search pickup address, airport, station..." autocomplete="off">
+                            <button type="button" class="btn-locate" id="btn-locate-pickup" onclick="triggerUseCurrentLocation('pickup')" title="Use Current GPS Location">
+                                <i class="bi bi-crosshair"></i>
+                            </button>
+                            <div id="pickup-suggestions" class="location-suggestions"></div>
+                        </div>
+
+                        <!-- Drop Location -->
+                        <div class="mb-3 location-input-group">
+                            <label class="form-label small fw-bold text-uppercase">Drop Destination</label>
+                            <i class="bi bi-flag-fill location-input-icon drop"></i>
+                            <input type="text" id="drop-address" class="form-control form-control-location" placeholder="Search destination address..." autocomplete="off">
+                            <button type="button" class="btn-locate" id="btn-locate-drop" onclick="triggerUseCurrentLocation('drop')" title="Use Current GPS Location">
+                                <i class="bi bi-crosshair"></i>
+                            </button>
+                            <div id="drop-suggestions" class="location-suggestions"></div>
+                        </div>
+
+                        <!-- Date, Time, Passengers -->
+                        <div class="row g-2 mb-2">
+                            <div class="col-sm-4">
+                                <label class="form-label small fw-bold text-uppercase">Date</label>
+                                <input type="date" id="pickup-date" class="form-control">
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label small fw-bold text-uppercase">Time</label>
+                                <input type="time" id="pickup-time" class="form-control" onchange="requestFareCalculation()">
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label small fw-bold text-uppercase">Passengers</label>
+                                <select id="passengers-count" class="form-select" onchange="requestFareCalculation()">
+                                    <option value="1" selected>1 Person</option>
+                                    <option value="2">2 Persons</option>
+                                    <option value="3">3 Persons</option>
+                                    <option value="4">4 Persons</option>
+                                    <option value="5">5 Persons (SUV)</option>
+                                    <option value="6">6 Persons (SUV)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-2">
+                            <label class="form-label small fw-bold text-uppercase">Special Notes for Driver (Optional)</label>
+                            <input type="text" id="customer-notes" class="form-control" placeholder="e.g. Near Gate 2, extra luggage, etc.">
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Vehicle Selection -->
+                    <div class="card border-0 shadow-sm p-4 rounded-4">
+                        <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                            <span class="badge bg-warning text-dark">Step 2</span> Select Vehicle Category
+                        </h5>
+                        <div id="vehicles-selection-list">
+                            <!-- Populated dynamically from API -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Interactive Leaflet Map & Dynamic Fare Breakdown -->
+                <div class="col-lg-6">
+                    <div class="map-card mb-4">
+                        <div id="booking-map"></div>
+                        <div class="map-status-overlay" id="map-route-summary">
+                            <div>
+                                <i class="bi bi-info-circle-fill text-warning me-1"></i>
+                                Enter pickup and destination or click on the map to draw your route.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Fare Card -->
+                    <div class="fare-breakdown-card" id="fare-breakdown-card">
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-compass fs-1 text-warning d-block mb-2"></i>
+                            <h6 class="fw-bold text-dark">Awaiting Route Details</h6>
+                            <p class="small mb-0">Select your pickup and drop locations on the left to calculate live road distance and exact fare.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer-jhaz">
+        <div class="container text-center text-muted small">
+            &copy; 2026 JhazTaxi. Clean, reliable, and production-ready taxi booking application.
+        </div>
+    </footer>
+
+    <!-- Leaflet JS & App Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/map.js"></script>
+    <script src="/js/booking.js"></script>
+</body>
+</html>

@@ -1,0 +1,358 @@
+/* ========================================================
+   JhazTaxi - Global Stylesheet
+   Theme: Yellow & Black Premium Taxi Aesthetic
+   ======================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-yellow: #FFC107;
+    --primary-yellow-hover: #E5A900;
+    --primary-yellow-light: #FFF9E6;
+    --primary-yellow-glow: rgba(255, 193, 7, 0.25);
+    
+    --dark-bg: #121212;
+    --dark-surface: #1E1E1E;
+    --dark-card: #252525;
+    --dark-border: #333333;
+    
+    --light-bg: #F8F9FA;
+    --light-surface: #FFFFFF;
+    --light-border: #E5E7EB;
+    
+    --text-main: #1F2937;
+    --text-muted: #6B7280;
+    --text-light: #F3F4F6;
+    
+    --accent-green: #10B981;
+    --accent-blue: #3B82F6;
+    --accent-red: #EF4444;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-full: 9999px;
+    
+    --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+    --shadow-hover: 0 20px 30px -10px rgba(0, 0, 0, 0.15);
+    --transition-fast: 0.2s ease-in-out;
+}
+
+body {
+    font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+    color: var(--text-main);
+    background-color: var(--light-bg);
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* Navbar */
+.navbar-jhaz {
+    background-color: rgba(18, 18, 18, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--primary-yellow);
+    transition: all var(--transition-fast);
+    padding: 14px 0;
+}
+
+.navbar-brand-jhaz {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: #FFFFFF !important;
+    letter-spacing: -0.5px;
+}
+
+.brand-badge {
+    background: var(--primary-yellow);
+    color: #000000;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 1.1rem;
+    font-weight: 900;
+    box-shadow: 0 2px 8px var(--primary-yellow-glow);
+}
+
+.nav-link-jhaz {
+    color: #E5E7EB !important;
+    font-weight: 500;
+    padding: 8px 16px !important;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.nav-link-jhaz:hover, .nav-link-jhaz.active {
+    color: var(--primary-yellow) !important;
+    background-color: rgba(255, 193, 7, 0.08);
+}
+
+/* Buttons */
+.btn-yellow {
+    background-color: var(--primary-yellow);
+    color: #000000;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 12px 26px;
+    transition: all var(--transition-fast);
+    box-shadow: 0 4px 14px var(--primary-yellow-glow);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-yellow:hover, .btn-yellow:focus {
+    background-color: var(--primary-yellow-hover);
+    color: #000000;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 193, 7, 0.4);
+}
+
+.btn-outline-yellow {
+    background-color: transparent;
+    color: var(--primary-yellow);
+    border: 2px solid var(--primary-yellow);
+    font-weight: 700;
+    border-radius: var(--radius-md);
+    padding: 10px 24px;
+    transition: all var(--transition-fast);
+}
+
+.btn-outline-yellow:hover {
+    background-color: var(--primary-yellow);
+    color: #000000;
+    transform: translateY(-2px);
+}
+
+.btn-dark-jhaz {
+    background-color: var(--dark-bg);
+    color: #FFFFFF;
+    font-weight: 600;
+    border: 1px solid var(--dark-border);
+    border-radius: var(--radius-md);
+    padding: 12px 24px;
+    transition: all var(--transition-fast);
+}
+
+.btn-dark-jhaz:hover {
+    background-color: #000000;
+    color: var(--primary-yellow);
+    border-color: var(--primary-yellow);
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #121212 0%, #1c1c1c 50%, #282828 100%);
+    color: #FFFFFF;
+    padding: 90px 0 100px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-yellow), transparent);
+}
+
+.hero-tagline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 193, 7, 0.15);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: var(--primary-yellow);
+    padding: 6px 16px;
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.hero-heading {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 20px;
+}
+
+.hero-heading span {
+    color: var(--primary-yellow);
+}
+
+.hero-subtext {
+    font-size: 1.2rem;
+    color: #D1D5DB;
+    margin-bottom: 35px;
+    line-height: 1.6;
+}
+
+/* Booking Preview Card on Hero */
+.hero-booking-card {
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    padding: 32px;
+    color: var(--text-main);
+    border: 1px solid var(--light-border);
+}
+
+/* Features & Steps */
+.step-number-badge {
+    width: 48px;
+    height: 48px;
+    background-color: var(--primary-yellow);
+    color: #000000;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.25rem;
+    margin-bottom: 20px;
+}
+
+.jhaz-card {
+    background: #FFFFFF;
+    border: 1px solid var(--light-border);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    box-shadow: var(--shadow-subtle);
+    transition: all var(--transition-fast);
+}
+
+.jhaz-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-card);
+    border-color: var(--primary-yellow);
+}
+
+/* Vehicle Showcase Card */
+.vehicle-card {
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--light-border);
+    overflow: hidden;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-subtle);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.vehicle-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-card);
+    border-color: var(--primary-yellow);
+}
+
+.vehicle-img-wrapper {
+    position: relative;
+    height: 200px;
+    background: #1A1A1A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.vehicle-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.vehicle-card:hover .vehicle-img-wrapper img {
+    transform: scale(1.05);
+}
+
+.vehicle-type-pill {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: var(--dark-bg);
+    color: var(--primary-yellow);
+    border: 1px solid var(--primary-yellow);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+}
+
+/* Reviews Stars */
+.rating-stars {
+    color: var(--primary-yellow);
+    display: inline-flex;
+    gap: 3px;
+}
+
+/* Footer */
+.footer-jhaz {
+    background-color: #0E0E0E;
+    color: #9CA3AF;
+    padding: 70px 0 30px;
+    border-top: 3px solid var(--primary-yellow);
+}
+
+.footer-jhaz h5 {
+    color: #FFFFFF;
+    font-size: 1.15rem;
+    margin-bottom: 20px;
+}
+
+.footer-jhaz a {
+    color: #9CA3AF;
+    text-decoration: none;
+    transition: color var(--transition-fast);
+    display: block;
+    margin-bottom: 10px;
+}
+
+.footer-jhaz a:hover {
+    color: var(--primary-yellow);
+}
+
+.footer-bottom {
+    border-top: 1px solid #222222;
+    padding-top: 25px;
+    margin-top: 50px;
+    font-size: 0.9rem;
+}
+
+/* Utility Animations & Loaders */
+.spinner-yellow {
+    color: var(--primary-yellow);
+}
+
+.pulse-badge {
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+}
+
+@media (max-width: 768px) {
+    .hero-heading {
+        font-size: 2.4rem;
+    }
+    .hero-section {
+        padding: 50px 0 60px;
+    }
+}
