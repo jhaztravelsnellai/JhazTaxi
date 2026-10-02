@@ -7,7 +7,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from users.views import admin_customers_list_view, admin_customer_toggle_status_view
-from bookings.analytics import admin_dashboard_stats_view, admin_reports_view, user_dashboard_stats_view
+from bookings.analytics import (
+    admin_dashboard_stats_view, admin_reports_view, user_dashboard_stats_view,
+    admin_archive_stats_view, admin_export_archive_csv_view, admin_purge_archive_view
+)
 
 def health_check(request):
     return JsonResponse({
@@ -70,6 +73,9 @@ urlpatterns = [
     # Admin Specific Views
     path('api/admin/dashboard-stats/', admin_dashboard_stats_view, name='admin_dashboard_stats'),
     path('api/admin/reports/', admin_reports_view, name='admin_reports'),
+    path('api/admin/reports/archive-stats/', admin_archive_stats_view, name='admin_archive_stats'),
+    path('api/admin/reports/archive-export/', admin_export_archive_csv_view, name='admin_archive_export'),
+    path('api/admin/reports/archive-purge/', admin_purge_archive_view, name='admin_archive_purge'),
     path('api/admin/customers/', admin_customers_list_view, name='admin_customers_list'),
     path('api/admin/customers/<int:customer_id>/toggle-status/', admin_customer_toggle_status_view, name='admin_customer_toggle'),
 

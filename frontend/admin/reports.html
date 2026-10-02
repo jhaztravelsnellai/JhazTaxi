@@ -98,6 +98,63 @@
                     </div>
                 </div>
 
+                <!-- 6-Month Historical Data Archival & DB Storage Optimizer Card -->
+                <div class="card border-0 shadow-sm rounded-4 bg-white mb-4 border-top border-4 border-primary">
+                    <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h5 class="fw-bold mb-1"><i class="bi bi-archive-fill text-primary me-2"></i>Historical Data Archiving & Database Storage Optimizer</h5>
+                            <p class="text-muted small mb-0">Download completed trips older than 6 months as an offline CSV/Excel spreadsheet and safely free up database storage.</p>
+                        </div>
+                        <span class="badge bg-success px-3 py-2" id="storage-health-badge"><i class="bi bi-shield-check me-1"></i> DB Storage: Optimal (&lt;1% used)</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-4 align-items-center">
+                            <div class="col-lg-6">
+                                <div class="p-3 bg-light rounded-4 border">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="small fw-bold text-muted text-uppercase">Trips Older Than:</span>
+                                        <select class="form-select form-select-sm w-auto fw-bold" id="archive-months-select" onchange="loadArchiveStats()">
+                                            <option value="3">3 Months Ago</option>
+                                            <option value="6" selected>6 Months Ago (Recommended)</option>
+                                            <option value="12">1 Year Ago</option>
+                                        </select>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="small text-muted">Cutoff Date:</span>
+                                        <strong id="archive-cutoff-date" class="text-dark">--</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="small text-muted">Archivable Historical Records:</span>
+                                        <span class="badge bg-warning text-dark fs-6" id="archive-count-badge">0 Trips</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="small text-muted">Estimated Database Usage:</span>
+                                        <span class="fw-bold text-primary" id="archive-db-usage">0.0 MB / 1024 MB (0%)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="d-flex flex-column gap-3">
+                                    <div>
+                                        <label class="form-label small fw-bold text-uppercase mb-1"><i class="bi bi-1-circle-fill text-primary me-1"></i> Step 1: Download & Save Archive</label>
+                                        <button type="button" class="btn btn-primary fw-bold w-100 py-2 shadow-sm" onclick="downloadArchiveCSV()">
+                                            <i class="bi bi-file-earmark-arrow-down-fill me-1"></i> Download Historical Trips (CSV)
+                                        </button>
+                                        <small class="text-muted d-block mt-1">Saves complete booking, passenger, and payment logs to your computer/Google Drive.</small>
+                                    </div>
+                                    <div>
+                                        <label class="form-label small fw-bold text-uppercase mb-1"><i class="bi bi-2-circle-fill text-danger me-1"></i> Step 2: Purge Archived Data from DB</label>
+                                        <button type="button" class="btn btn-outline-danger fw-bold w-100 py-2 shadow-sm" id="btn-purge-archive" onclick="confirmPurgeArchive()">
+                                            <i class="bi bi-trash3-fill me-1"></i> Purge Archived Records & Free Space
+                                        </button>
+                                        <small class="text-muted d-block mt-1">Cleans live database records while your downloaded CSV remains safe on your computer.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Driver Performance Table -->
                 <div class="admin-table-card mb-4">
                     <div class="admin-table-header">

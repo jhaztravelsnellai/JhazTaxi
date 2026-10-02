@@ -766,6 +766,108 @@ async function loadAdminReports() {
             `).join('');
         }
     }
+
+    // Also load historical archive status and storage statistics
+    loadArchiveStats();
+}
+
+// 8b. Historical Archive & Storage Optimizer Functions
+async function loadArchiveStats() {
+    const months = document.getElementById('archive-months-select')?.value || 6;
+    const res = await fetchWithAuth(`${CONFIG.API_BASE_URL}/admin/reports/archive-stats/?months=${months}`);
+    if (res.ok && res.data.success) {
+        const s = res.data;
+        const cutoffEl = document.getElementById('archive-cutoff-date');
+        const countEl = document.getElementById('archive-count-badge');
+        const usageEl = document.getElementById('archive-db-usage');
+        const purgeBtn = document.getElementById('btn-purge-archive');
+
+        if (cutoffEl) cutoffEl.textContent = `${s.cutoff_date} (${s.months} months ago)`;
+        if (countEl) countEl.textContent = `${s.archivable_count} Trips`;
+        if (usageEl) usageEl.textContent = `${s.estimated_db_mb} MB / 1024 MB (${s.storage_percent}%)`;
+
+        if (purgeBtn) {
+            purgeBtn.disabled = s.archivable_count === 0;
+            if (s.archivable_count === 0) {
+                purgeBtn.title = 'No old trips to purge';
+            }
+        }
+    }
+}
+
+async function downloadArchiveCSV() {
+    requireAdmin();
+    const months = document.getElementById('archive-months-select')?.value || 6;
+    const token = getAuthToken();
+    const exportUrl = `${CONFIG.API_BASE_URL}/admin/reports/archive-export/?months=${months}`;
+
+    showToast(`Generating ${months}-month archive CSV export...`, 'info');
+
+    try {
+        const response = await fetch(exportUrl, {
+            headers: {
+                'Authorization': `Token ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            showToast('Failed to export archive CSV file.', 'error');
+            return;
+        }
+
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = downloadUrl;
+        a.download = `jhaztaxi_archive_${months}_months_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(downloadUrl);
+        a.remove();
+
+        showToast('Archive CSV downloaded successfully! Save it safely before purging.', 'success');
+    } catch (e) {
+        showToast('Network error while downloading archive.', 'error');
+    }
+}
+
+async function confirmPurgeArchive() {
+    requireAdmin();
+    const months = document.getElementById('archive-months-select')?.value || 6;
+
+    const confirmed = confirm(
+        `⚠️ IMPORTANT DATABASE CLEANUP:\n\n` +
+        `You are about to PERMANENTLY delete historical completed trips older than ${months} months from the live database.\n\n` +
+        `Make sure you have clicked "Step 1: Download & Save Archive (CSV)" first so your records are saved.\n\n` +
+        `Do you want to proceed with purging live database records?`
+    );
+
+    if (!confirmed) return;
+
+    const purgeBtn = document.getElementById('btn-purge-archive');
+    if (purgeBtn) {
+        purgeBtn.disabled = true;
+        purgeBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Purging...';
+    }
+
+    const res = await fetchWithAuth(`${CONFIG.API_BASE_URL}/admin/reports/archive-purge/`, {
+        method: 'POST',
+        body: JSON.stringify({ months: months })
+    });
+
+    if (purgeBtn) {
+        purgeBtn.disabled = false;
+        purgeBtn.innerHTML = '<i class="bi bi-trash3-fill me-1"></i> Purge Archived Records & Free Space';
+    }
+
+    if (res.ok && res.data.success) {
+        showToast(res.data.message || 'Archived records successfully purged!', 'success');
+        loadArchiveStats();
+        loadAdminReports();
+    } else {
+        showToast(res.data.message || 'Failed to purge archived records.', 'error');
+    }
 }
 
 

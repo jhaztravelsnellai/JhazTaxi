@@ -187,3 +187,147 @@ def admin_reports_view(request):
             'popular_routes': popular_routes,
         }
     })
+
+
+# ==============================================================
+# Historical Data Archiving & Live DB Storage Optimizer
+# ==============================================================
+
+import csv
+from django.http import HttpResponse
+
+@api_view(['GET'])
+def admin_archive_stats_view(request):
+    """
+    Returns metrics on bookings older than X months (default 6 months)
+    ready for cold-storage export and purging to optimize database storage.
+    """
+    if not request.user.is_authenticated or (request.user.role != 'admin' and not request.user.is_staff):
+        return Response({'success': False, 'message': 'Admin permission required'}, status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        months = int(request.query_params.get('months', 6))
+    except (ValueError, TypeError):
+        months = 6
+
+    today = timezone.localdate() if hasattr(timezone, 'localdate') else date.today()
+    cutoff_date = today - timedelta(days=months * 30)
+
+    # Historical completed or cancelled bookings before cutoff
+    archivable_qs = Booking.objects.filter(
+        status__in=['trip_completed', 'cancelled'],
+        pickup_date__lt=cutoff_date
+    )
+    archivable_count = archivable_qs.count()
+    total_bookings = Booking.objects.count()
+
+    # Calculate approximate disk storage size
+    est_db_kb = total_bookings * 2.5
+    est_db_mb = round(est_db_kb / 1024, 2)
+
+    return Response({
+        'success': True,
+        'months': months,
+        'cutoff_date': str(cutoff_date),
+        'archivable_count': archivable_count,
+        'total_bookings': total_bookings,
+        'estimated_db_mb': est_db_mb,
+        'storage_limit_mb': 1024.0, # 1 GB
+        'storage_percent': round((est_db_mb / 1024.0) * 100, 2)
+    })
+
+
+@api_view(['GET'])
+def admin_export_archive_csv_view(request):
+    """
+    Exports all bookings older than X months (default 6 months) into a structured CSV file.
+    Admin can save this file permanently to their computer / Google Drive.
+    """
+    if not request.user.is_authenticated or (request.user.role != 'admin' and not request.user.is_staff):
+        return Response({'success': False, 'message': 'Admin permission required'}, status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        months = int(request.query_params.get('months', 6))
+    except (ValueError, TypeError):
+        months = 6
+
+    today = timezone.localdate() if hasattr(timezone, 'localdate') else date.today()
+    cutoff_date = today - timedelta(days=months * 30)
+
+    bookings = Booking.objects.filter(
+        status__in=['trip_completed', 'cancelled'],
+        pickup_date__lt=cutoff_date
+    ).select_related('customer', 'driver', 'vehicle').order_by('pickup_date', 'pickup_time')
+
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="jhaztaxi_archive_trips_before_{cutoff_date}.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow([
+        'Booking ID', 'Trip Date', 'Pickup Time',
+        'Customer Name', 'Customer Phone',
+        'Driver Name', 'Driver Phone', 'Vehicle Class',
+        'Pickup Address', 'Drop Destination',
+        'Distance (KM)', 'Total Fare (INR)',
+        'Payment Method', 'Payment Status', 'Trip Status', 'Created At'
+    ])
+
+    for b in bookings:
+        c_name = b.customer.get_full_name() if b.customer else 'Guest'
+        c_phone = b.customer.phone_number if b.customer else ''
+        d_name = b.driver.name if b.driver else 'Unassigned'
+        d_phone = b.driver.phone if b.driver else ''
+        v_class = b.vehicle.vehicle_type if b.vehicle else 'Standard'
+
+        writer.writerow([
+            b.booking_id, b.pickup_date, b.pickup_time,
+            c_name, c_phone,
+            d_name, d_phone, v_class,
+            b.pickup_address, b.drop_address,
+            float(b.distance_km), float(b.total_fare),
+            b.payment_method.upper(), b.payment_status.capitalize(),
+            b.status.replace('_', ' ').title(), b.created_at.strftime('%Y-%m-%d %H:%M')
+        ])
+
+    return response
+
+
+@api_view(['POST'])
+def admin_purge_archive_view(request):
+    """
+    Safely purges historical completed/cancelled bookings older than X months (default 6)
+    from the live database to keep storage minimal and fast.
+    """
+    if not request.user.is_authenticated or (request.user.role != 'admin' and not request.user.is_staff):
+        return Response({'success': False, 'message': 'Admin permission required'}, status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        months = int(request.data.get('months', 6))
+    except (ValueError, TypeError):
+        months = 6
+
+    today = timezone.localdate() if hasattr(timezone, 'localdate') else date.today()
+    cutoff_date = today - timedelta(days=months * 30)
+
+    archivable_qs = Booking.objects.filter(
+        status__in=['trip_completed', 'cancelled'],
+        pickup_date__lt=cutoff_date
+    )
+    count = archivable_qs.count()
+
+    if count == 0:
+        return Response({
+            'success': True,
+            'purged_count': 0,
+            'message': f'No historical trips older than {months} months (before {cutoff_date}) found to purge.'
+        })
+
+    # Delete records (cascading deletes related payments, requests, reviews)
+    archivable_qs.delete()
+
+    return Response({
+        'success': True,
+        'purged_count': count,
+        'message': f'Successfully purged {count} historical trip records before {cutoff_date}. Database storage freed!'
+    })
+
