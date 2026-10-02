@@ -117,6 +117,21 @@ def init_production():
     else:
         print(f" [INFO] Vehicle catalog already initialized ({Vehicle.objects.count()} vehicles). Skipping.")
 
+    # 3. Ensure Default PaymentSetting exists for Admin GPay Scanner
+    from payments.models import PaymentSetting
+    p_set, created = PaymentSetting.objects.get_or_create(
+        defaults={
+            'title': 'Official GPay / UPI Scanner',
+            'upi_id': 'jhaztaxi@upi',
+            'payee_name': 'JhazTaxi Travels',
+            'phone_number': '+91 98765 43210',
+            'instructions': 'Scan this official QR code using Google Pay, PhonePe, Paytm, or any BHIM UPI app. Show payment confirmation screen to your driver upon arrival or trip completion.',
+            'is_active': True
+        }
+    )
+    if created:
+        print(" [OK] Initialized default PaymentSetting for GPay & UPI.")
+
     print("==================================================================")
     print("   PRODUCTION INITIALIZATION COMPLETE")
     print("==================================================================")

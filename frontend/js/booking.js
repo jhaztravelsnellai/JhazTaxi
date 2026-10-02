@@ -264,27 +264,30 @@ function renderFareBreakdown(est) {
             <label class="form-label fw-bold small text-uppercase">Payment Method</label>
             <div class="d-flex flex-column flex-sm-row gap-2">
                 <div class="form-check p-3 border rounded-3 bg-light flex-grow-1">
-                    <input class="form-check-input ms-0 me-2" type="radio" name="payment_method" id="pay_cash" value="cash" checked onchange="currentBookingState.paymentMethod = 'cash'">
+                    <input class="form-check-input ms-0 me-2" type="radio" name="payment_method" id="pay_cash" value="cash" checked onchange="currentBookingState.paymentMethod = 'cash'; toggleGPayScannerBox(false)">
                     <label class="form-check-label fw-bold text-dark" for="pay_cash">
                         <i class="bi bi-cash-stack me-1 text-success fs-5 align-middle"></i> Cash on Delivery (COD)
                         <small class="d-block text-muted fw-normal">Pay cash directly to driver at destination</small>
                     </label>
                 </div>
                 <div class="form-check p-3 border rounded-3 bg-light flex-grow-1">
-                    <input class="form-check-input ms-0 me-2" type="radio" name="payment_method" id="pay_gpay" value="gpay" onchange="currentBookingState.paymentMethod = 'gpay'">
+                    <input class="form-check-input ms-0 me-2" type="radio" name="payment_method" id="pay_gpay" value="gpay" onchange="currentBookingState.paymentMethod = 'gpay'; toggleGPayScannerBox(true)">
                     <label class="form-check-label fw-bold text-dark" for="pay_gpay">
                         <i class="bi bi-google me-1 text-primary fs-5 align-middle"></i> Google Pay (GPay)
-                        <small class="d-block text-muted fw-normal">Scan driver GPay QR or pay via GPay</small>
+                        <small class="d-block text-muted fw-normal">Official Admin GPay QR Scanner</small>
                     </label>
                 </div>
                 <div class="form-check p-3 border rounded-3 bg-light flex-grow-1">
-                    <input class="form-check-input ms-0 me-2" type="radio" name="payment_method" id="pay_upi" value="upi" onchange="currentBookingState.paymentMethod = 'upi'">
+                    <input class="form-check-input ms-0 me-2" type="radio" name="payment_method" id="pay_upi" value="upi" onchange="currentBookingState.paymentMethod = 'upi'; toggleGPayScannerBox(true)">
                     <label class="form-check-label fw-bold text-dark" for="pay_upi">
                         <i class="bi bi-qr-code-scan me-1 text-info fs-5 align-middle"></i> PhonePe / Paytm / UPI
-                        <small class="d-block text-muted fw-normal">Transfer to driver UPI ID or QR</small>
+                        <small class="d-block text-muted fw-normal">Official Admin UPI QR Scanner</small>
                     </label>
                 </div>
             </div>
+
+            <!-- Dynamic Admin-Uploaded GPay Scanner Display -->
+            <div id="booking-gpay-scanner-box" class="mt-3" style="display: none;"></div>
         </div>
 
         <button class="btn btn-yellow w-100 mt-4 py-3 fw-bold fs-5 shadow" id="btn-confirm-booking" onclick="submitBookingOrder()">
@@ -292,6 +295,68 @@ function renderFareBreakdown(est) {
         </button>
     `;
 }
+
+// Dynamic GPay Scanner display for customer
+async function toggleGPayScannerBox(show) {
+    let box = document.getElementById('booking-gpay-scanner-box');
+    if (!box) return;
+
+    if (!show) {
+        box.style.display = 'none';
+        return;
+    }
+
+    box.style.display = 'block';
+    box.innerHTML = `
+        <div class="text-center py-3 bg-light rounded-3">
+            <span class="spinner-border spinner-border-sm text-warning"></span>
+            <span class="ms-2 small text-muted">Fetching official GPay scanner...</span>
+        </div>
+    `;
+
+    try {
+        const res = await fetch(`${CONFIG.API_BASE_URL}/payment-settings/`);
+        const data = await res.json();
+        if (data.success && data.setting) {
+            const s = data.setting;
+            box.innerHTML = `
+                <div class="border rounded-4 p-3 bg-white shadow-sm border-warning">
+                    <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
+                        <span class="fw-bold text-dark"><i class="bi bi-google text-primary me-2"></i>Official JhazTaxi GPay Scanner</span>
+                        <span class="badge bg-success-subtle text-success border border-success">Verified Business QR</span>
+                    </div>
+                    <div class="row align-items-center g-3">
+                        <div class="col-sm-5 text-center">
+                            <img src="${s.qr_image_url || '/assets/icons/favicon.svg'}" alt="Official GPay Scanner" class="img-fluid rounded-3 shadow-sm border p-1" style="max-height: 180px;">
+                            <div class="small text-muted mt-1"><i class="bi bi-shield-check text-success"></i> Scan to Pay ₹${currentBookingState.estimatedFare || 'Fare'}</div>
+                        </div>
+                        <div class="col-sm-7">
+                            <div class="mb-2">
+                                <small class="text-muted d-block">Payee Name:</small>
+                                <span class="fw-bold text-dark">${s.payee_name || 'JhazTaxi Travels'}</span>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted d-block">UPI ID / VPA:</small>
+                                <div class="d-flex align-items-center gap-2">
+                                    <code class="fw-bold fs-6 text-primary">${s.upi_id || 'jhaztaxi@upi'}</code>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="navigator.clipboard.writeText('${s.upi_id}'); showToast('UPI ID copied!', 'info')">
+                                        <i class="bi bi-clipboard"></i> Copy
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="alert alert-light border small text-muted mb-0 py-2">
+                                <i class="bi bi-info-circle me-1"></i> ${s.instructions || 'You can scan and pay now or pay the driver directly upon arrival.'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    } catch (e) {
+        box.style.display = 'none';
+    }
+}
+
 
 // Submit Booking Order to Backend
 async function submitBookingOrder() {

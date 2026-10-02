@@ -1042,3 +1042,191 @@ async function handleCreateWhatsAppBooking(event) {
     }
 }
 
+// ==========================================
+// 12. Admin Fare & GPay Scanner Management
+// ==========================================
+
+async function loadAdminFares() {
+    requireAdmin();
+    await Promise.all([
+        loadAdminGPaySettings(),
+        loadVehicleFares()
+    ]);
+}
+
+async function loadAdminGPaySettings() {
+    const res = await fetchWithAuth(`${CONFIG.API_BASE_URL}/payment-settings/`);
+    if (!res.ok || !res.data.success) {
+        showToast('Could not load GPay scanner settings.', 'warning');
+        return;
+    }
+    const s = res.data.setting;
+
+    const upiInput = document.getElementById('gpay_upi_id');
+    const payeeInput = document.getElementById('gpay_payee_name');
+    const phoneInput = document.getElementById('gpay_phone');
+    const instructionsInput = document.getElementById('gpay_instructions');
+    const activeSwitch = document.getElementById('gpay_is_active');
+    const qrImg = document.getElementById('admin-gpay-qr-preview');
+    const qrBadge = document.getElementById('admin-gpay-qr-badge');
+
+    if (upiInput) upiInput.value = s.upi_id || '';
+    if (payeeInput) payeeInput.value = s.payee_name || '';
+    if (phoneInput) phoneInput.value = s.phone_number || '';
+    if (instructionsInput) instructionsInput.value = s.instructions || '';
+    if (activeSwitch) activeSwitch.checked = !!s.is_active;
+
+    if (qrImg && s.qr_image_url) {
+        qrImg.src = s.qr_image_url;
+    }
+    if (qrBadge) {
+        qrBadge.textContent = s.qr_image ? 'Custom Scanner Uploaded' : 'Active Scanner (Live)';
+        qrBadge.className = s.qr_image ? 'badge bg-success px-3 py-2' : 'badge bg-primary px-3 py-2';
+    }
+}
+
+async function saveGPaySettings(e) {
+    e.preventDefault();
+    requireAdmin();
+
+    const form = e.target;
+    const submitBtn = document.getElementById('btn-save-gpay') || form.querySelector('button[type="submit"]');
+    const fileInput = document.getElementById('gpay_qr_file');
+
+    const formData = new FormData();
+    formData.append('upi_id', document.getElementById('gpay_upi_id').value.trim());
+    formData.append('payee_name', document.getElementById('gpay_payee_name').value.trim());
+    formData.append('phone_number', document.getElementById('gpay_phone').value.trim());
+    formData.append('instructions', document.getElementById('gpay_instructions').value.trim());
+    formData.append('is_active', document.getElementById('gpay_is_active').checked);
+
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+        formData.append('qr_image', fileInput.files[0]);
+    }
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving Scanner...';
+    }
+
+    const token = getAuthToken();
+    try {
+        const res = await fetch(`${CONFIG.API_BASE_URL}/payment-settings/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Token ${token}`
+            },
+            body: formData
+        });
+        const data = await res.json();
+
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-cloud-arrow-up-fill me-1"></i> Save & Publish GPay Scanner';
+        }
+
+        if (res.ok && data.success) {
+            showToast('Official GPay Scanner & UPI details saved successfully!', 'success');
+            if (data.setting && data.setting.qr_image_url) {
+                const qrImg = document.getElementById('admin-gpay-qr-preview');
+                if (qrImg) qrImg.src = data.setting.qr_image_url;
+            }
+            loadAdminGPaySettings();
+        } else {
+            const err = data.errors ? Object.values(data.errors).flat().join(', ') : (data.message || 'Failed to save GPay scanner');
+            showToast(err, 'error');
+        }
+    } catch (err) {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-cloud-arrow-up-fill me-1"></i> Save & Publish GPay Scanner';
+        }
+        showToast('Network error while saving GPay scanner.', 'error');
+    }
+}
+
+async function loadVehicleFares() {
+    const container = document.getElementById('fares-cards-container');
+    if (!container) return;
+
+    const res = await fetchWithAuth(`${CONFIG.API_BASE_URL}/fare-settings/`);
+    if (!res.ok) {
+        container.innerHTML = `<div class="col-12"><div class="alert alert-danger">Failed to load fare rules.</div></div>`;
+        return;
+    }
+
+    const fares = Array.isArray(res.data) ? res.data : (res.data.fares || []);
+    if (!fares.length) {
+        container.innerHTML = `<div class="col-12 text-center text-muted py-4">No fare settings found.</div>`;
+        return;
+    }
+
+    container.innerHTML = fares.map(f => `
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+                <div class="card-header bg-dark text-white rounded-top-4 py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold">${f.vehicle_type} Class</h6>
+                    <span class="badge ${f.is_active ? 'bg-success' : 'bg-secondary'}">${f.is_active ? 'Active' : 'Disabled'}</span>
+                </div>
+                <div class="card-body p-3">
+                    <form onsubmit="saveVehicleFare('${f.vehicle_type}', event)">
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold text-muted mb-1">Base Fare (₹)</label>
+                            <input type="number" step="0.5" class="form-control form-control-sm" name="base_fare" value="${f.base_fare}" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold text-muted mb-1">Rate / Km (₹)</label>
+                            <input type="number" step="0.5" class="form-control form-control-sm" name="price_per_km" value="${f.price_per_km}" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold text-muted mb-1">Min Fare (₹)</label>
+                            <input type="number" step="0.5" class="form-control form-control-sm" name="min_fare" value="${f.min_fare || f.base_fare}" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold text-muted mb-1">Waiting Fee / Min (₹)</label>
+                            <input type="number" step="0.5" class="form-control form-control-sm" name="waiting_charge_per_min" value="${f.waiting_charge_per_min || 2.0}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted mb-1">Night Charge (%)</label>
+                            <input type="number" step="1" class="form-control form-control-sm" name="night_charge_percent" value="${f.night_charge_percent || 20}">
+                        </div>
+                        <button type="submit" class="btn btn-warning btn-sm w-100 fw-bold">
+                            <i class="bi bi-save me-1"></i> Update ${f.vehicle_type} Rates
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function saveVehicleFare(vType, e) {
+    e.preventDefault();
+    requireAdmin();
+    const form = e.target;
+    const btn = form.querySelector('button[type="submit"]');
+
+    const payload = {
+        base_fare: form.base_fare.value,
+        price_per_km: form.price_per_km.value,
+        min_fare: form.min_fare.value,
+        waiting_charge_per_min: form.waiting_charge_per_min.value,
+        night_charge_percent: form.night_charge_percent.value
+    };
+
+    if (btn) btn.disabled = true;
+    const res = await fetchWithAuth(`${CONFIG.API_BASE_URL}/fare-settings/${vType}/`, {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+    });
+    if (btn) btn.disabled = false;
+
+    if (res.ok && res.data.success) {
+        showToast(`${vType} fare rates updated successfully!`, 'success');
+        loadVehicleFares();
+    } else {
+        showToast(res.data.message || `Failed to update ${vType} rates`, 'error');
+    }
+}
+
+

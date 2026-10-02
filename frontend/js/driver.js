@@ -340,7 +340,17 @@ async function loadMyAssignedRides() {
                     collectIcon = 'bi-qr-code-scan';
                 }
 
+                let showQRBtn = '';
+                if (b.payment_method === 'gpay' || b.payment_method === 'upi') {
+                    showQRBtn = `
+                        <button class="btn btn-outline-primary fw-bold py-2 w-100 shadow-sm mb-2" onclick="openDriverGPayQRModal('${b.booking_id}', ${b.total_fare}, '${(b.customer_name || 'Passenger').replace(/'/g, "\\'")}')">
+                            <i class="bi bi-qr-code-scan me-1"></i> 📱 Show Customer GPay Scanner
+                        </button>
+                    `;
+                }
+
                 controlsHtml = `
+                    ${showQRBtn}
                     <button class="btn ${collectBtnClass} fw-bold py-2 w-100 shadow-sm" onclick="confirmCompleteTripPayment('${b.booking_id}', '${b.payment_method}', ${b.total_fare})">
                         <i class="bi ${collectIcon} me-1"></i> ${collectBtnText}
                     </button>
@@ -524,3 +534,74 @@ async function loadMyRequests() {
         }).join('');
     }
 }
+
+// 5. Driver GPay Scanner Modal (Shows Admin's Official GPay QR to Customer in Vehicle)
+async function openDriverGPayQRModal(bookingId, fare, customerName) {
+    let modalEl = document.getElementById('driverGPayModal');
+    if (!modalEl) {
+        modalEl = document.createElement('div');
+        modalEl.id = 'driverGPayModal';
+        modalEl.className = 'modal fade';
+        modalEl.tabIndex = -1;
+        modalEl.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header bg-dark text-white border-0 py-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-warning text-dark"><i class="bi bi-google"></i> GPay</span>
+                            <h5 class="modal-title fw-bold mb-0">Collect Trip Payment</h5>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4 text-center" id="driver-gpay-modal-body">
+                        <div class="py-4">
+                            <span class="spinner-border text-warning"></span>
+                            <p class="text-muted mt-2">Loading official GPay scanner...</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 bg-light justify-content-between">
+                        <span class="text-muted small"><i class="bi bi-shield-check text-success me-1"></i> Admin Authorized Scanner</span>
+                        <button type="button" class="btn btn-dark fw-bold btn-sm px-3" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalEl);
+    }
+
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+
+    const bodyEl = document.getElementById('driver-gpay-modal-body');
+    try {
+        const res = await fetch(`${CONFIG.API_BASE_URL}/payment-settings/`);
+        const data = await res.json();
+        if (data.success && data.setting) {
+            const s = data.setting;
+            bodyEl.innerHTML = `
+                <div class="mb-3">
+                    <span class="badge bg-warning-subtle text-dark border border-warning px-3 py-1 mb-2">Trip ${bookingId}</span>
+                    <h3 class="fw-bold text-success mb-1">₹${fare}</h3>
+                    <p class="text-muted small mb-0">Passenger: <strong>${customerName}</strong></p>
+                </div>
+                <div class="p-3 bg-light rounded-4 border d-inline-block shadow-sm mb-3">
+                    <img src="${s.qr_image_url || '/assets/icons/favicon.svg'}" alt="Official GPay QR" class="img-fluid rounded-3" style="max-height: 250px; background: white; padding: 10px;">
+                </div>
+                <div class="mb-2">
+                    <span class="text-muted small">Payee:</span> <strong class="text-dark">${s.payee_name || 'JhazTaxi Travels'}</strong>
+                </div>
+                <div class="mb-3">
+                    <span class="text-muted small">UPI ID:</span> <code class="fw-bold text-primary fs-6">${s.upi_id || 'jhaztaxi@upi'}</code>
+                </div>
+                <div class="alert alert-light border small text-muted py-2 mb-0">
+                    <i class="bi bi-phone me-1 text-primary"></i> ${s.instructions || 'Show this QR scanner to passenger. Ask them to scan using GPay, PhonePe, or Paytm.'}
+                </div>
+            `;
+        } else {
+            bodyEl.innerHTML = `<div class="alert alert-warning">Unable to load GPay scanner.</div>`;
+        }
+    } catch (e) {
+        bodyEl.innerHTML = `<div class="alert alert-danger">Error connecting to server.</div>`;
+    }
+}
+
