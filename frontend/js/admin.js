@@ -1149,13 +1149,13 @@ async function loadVehicleFares() {
     const container = document.getElementById('fares-cards-container');
     if (!container) return;
 
-    const res = await fetchWithAuth(`${CONFIG.API_BASE_URL}/fare-settings/`);
-    if (!res.ok) {
+    const res = await fetchWithAuth(`${CONFIG.API_BASE_URL}/fare/`);
+    if (!res.ok || !res.data) {
         container.innerHTML = `<div class="col-12"><div class="alert alert-danger">Failed to load fare rules.</div></div>`;
         return;
     }
 
-    const fares = Array.isArray(res.data) ? res.data : (res.data.fares || []);
+    const fares = (res.data && res.data.fares) ? res.data.fares : (Array.isArray(res.data) ? res.data : []);
     if (!fares.length) {
         container.innerHTML = `<div class="col-12 text-center text-muted py-4">No fare settings found.</div>`;
         return;
