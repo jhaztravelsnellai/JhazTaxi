@@ -24,12 +24,19 @@ const CONFIG = {
     TAGLINE: 'Your Ride, Your Way.',
     CURRENCY_SYMBOL: '₹',
 
-    // Map Defaults (Bengaluru / India coordinates default)
-    MAP_DEFAULT_CENTER: [12.9716, 77.5946],
+    // Map Defaults (Tirunelveli / Tamil Nadu coordinates)
+    MAP_DEFAULT_CENTER: [8.7139, 77.7567],
     MAP_DEFAULT_ZOOM: 12,
 
-    // Routing Service (OSRM Public API with fallback calculation)
+    // Map Tile Configuration (CARTO Voyager CDN - 100% Free, Fast, NEVER blocked on Render/Vercel)
+    MAP_TILE_URL: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    MAP_TILE_SUBDOMAINS: ['a', 'b', 'c', 'd'],
+    MAP_ATTRIBUTION: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+
+    // Routing & Geocoding Services
     OSRM_ROUTING_URL: 'https://router.project-osrm.org/route/v1/driving/',
+    PHOTON_SEARCH_URL: 'https://photon.komoot.io/api/',
+    PHOTON_REVERSE_URL: 'https://photon.komoot.io/reverse',
     NOMINATIM_SEARCH_URL: 'https://nominatim.openstreetmap.org/search',
 };
 

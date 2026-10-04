@@ -814,9 +814,20 @@ async function initAdminLiveMap() {
     if (!mapEl || typeof L === 'undefined') return;
 
     adminMap = L.map('admin-live-map').setView(CONFIG.MAP_DEFAULT_CENTER, 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap | JhazTaxi Dispatch'
+    const tileUrl = (typeof CONFIG !== 'undefined' && CONFIG.MAP_TILE_URL) 
+        ? CONFIG.MAP_TILE_URL 
+        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    const subdomains = (typeof CONFIG !== 'undefined' && CONFIG.MAP_TILE_SUBDOMAINS)
+        ? CONFIG.MAP_TILE_SUBDOMAINS
+        : ['a', 'b', 'c', 'd'];
+    const attribution = (typeof CONFIG !== 'undefined' && CONFIG.MAP_ATTRIBUTION)
+        ? CONFIG.MAP_ATTRIBUTION
+        : '&copy; OpenStreetMap contributors &copy; CARTO';
+
+    L.tileLayer(tileUrl, {
+        subdomains: subdomains,
+        maxZoom: 20,
+        attribution: attribution
     }).addTo(adminMap);
 
     await refreshAdminMapDrivers();

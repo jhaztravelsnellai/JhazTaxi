@@ -31,10 +31,21 @@ class JhazMapService {
             scrollWheelZoom: true
         }).setView(CONFIG.MAP_DEFAULT_CENTER, CONFIG.MAP_DEFAULT_ZOOM);
 
-        // OpenStreetMap Tile Layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors | JhazTaxi'
+        // High-Speed CARTO Voyager CDN Tile Layer (Free, Fast, NEVER blocked on Render/Vercel)
+        const tileUrl = (typeof CONFIG !== 'undefined' && CONFIG.MAP_TILE_URL) 
+            ? CONFIG.MAP_TILE_URL 
+            : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+        const subdomains = (typeof CONFIG !== 'undefined' && CONFIG.MAP_TILE_SUBDOMAINS)
+            ? CONFIG.MAP_TILE_SUBDOMAINS
+            : ['a', 'b', 'c', 'd'];
+        const attribution = (typeof CONFIG !== 'undefined' && CONFIG.MAP_ATTRIBUTION)
+            ? CONFIG.MAP_ATTRIBUTION
+            : '&copy; OpenStreetMap contributors &copy; CARTO';
+
+        L.tileLayer(tileUrl, {
+            subdomains: subdomains,
+            maxZoom: 20,
+            attribution: attribution
         }).addTo(this.map);
 
         // Click on map to place markers if not set
@@ -247,35 +258,84 @@ class JhazMapService {
         this.map.fitBounds(bounds, { padding: [50, 50] });
     }
 
-    // Geocode Search via Nominatim OpenStreetMap
+    // Geocode Search: Uses Photon API as primary (never blocks Render / CORS enabled), with Nominatim fallback
     async searchLocation(query) {
         if (!query || query.length < 3) return [];
+
+        // 1. Try Photon Geocoder (Fast, OpenStreetMap data, allows Render & CORS)
         try {
-            const url = `${CONFIG.NOMINATIM_SEARCH_URL}?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`;
+            const photonUrl = `${(typeof CONFIG !== 'undefined' && CONFIG.PHOTON_SEARCH_URL) || 'https://photon.komoot.io/api/'}?q=${encodeURIComponent(query)}&limit=5`;
+            const res = await fetch(photonUrl);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.features && data.features.length > 0) {
+                    return data.features.map(f => {
+                        const p = f.properties || {};
+                        const parts = [p.name, p.street, p.district || p.city, p.state, p.country].filter(Boolean);
+                        const label = parts.length > 1 ? parts.join(', ') : (p.name || 'Location');
+                        return {
+                            displayName: label,
+                            lat: f.geometry.coordinates[1],
+                            lng: f.geometry.coordinates[0]
+                        };
+                    });
+                }
+            }
+        } catch (e) {
+            console.warn('Photon geocoding error, falling back:', e);
+        }
+
+        // 2. Fallback to Nominatim OpenStreetMap
+        try {
+            const url = `${(typeof CONFIG !== 'undefined' && CONFIG.NOMINATIM_SEARCH_URL) || 'https://nominatim.openstreetmap.org/search'}?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`;
             const res = await fetch(url, {
                 headers: { 'Accept-Language': 'en' }
             });
-            const data = await res.json();
-            return data.map(item => ({
-                displayName: item.display_name,
-                lat: parseFloat(item.lat),
-                lng: parseFloat(item.lon)
-            }));
+            if (res.ok) {
+                const data = await res.json();
+                return data.map(item => ({
+                    displayName: item.display_name,
+                    lat: parseFloat(item.lat),
+                    lng: parseFloat(item.lon)
+                }));
+            }
         } catch (e) {
             return [];
         }
+        return [];
     }
 
-    // Reverse Geocode
+    // Reverse Geocode: Uses Photon reverse as primary, Nominatim as fallback
     async reverseGeocode(lat, lng) {
+        // 1. Try Photon Reverse
+        try {
+            const pUrl = `${(typeof CONFIG !== 'undefined' && CONFIG.PHOTON_REVERSE_URL) || 'https://photon.komoot.io/reverse'}?lat=${lat}&lon=${lng}`;
+            const res = await fetch(pUrl);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.features && data.features.length > 0) {
+                    const p = data.features[0].properties || {};
+                    const parts = [p.name, p.street, p.district || p.city, p.state].filter(Boolean);
+                    if (parts.length > 0) return parts.join(', ');
+                }
+            }
+        } catch (e) {
+            // Fall through
+        }
+
+        // 2. Try Nominatim Reverse
         try {
             const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
             const res = await fetch(url);
-            const data = await res.json();
-            return data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            if (res.ok) {
+                const data = await res.json();
+                if (data.display_name) return data.display_name;
+            }
         } catch (e) {
-            return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            // Fall through
         }
+
+        return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
     }
 
     // Use HTML5 Browser Geolocation
