@@ -155,7 +155,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <label class="form-label small fw-bold text-uppercase">Customer Phone / WhatsApp *</label>
-                                <input type="text" name="customer_phone" class="form-control" placeholder="+91 98888 77777" required>
+                                <input type="text" name="customer_phone" class="form-control" placeholder="e.g. 9043519772" required>
                             </div>
                         </div>
 
@@ -164,14 +164,14 @@
                                 <label class="form-label small fw-bold text-uppercase">Pickup Address *</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light text-success"><i class="bi bi-geo-alt-fill"></i></span>
-                                    <input type="text" name="pickup_address" class="form-control" placeholder="e.g. Indiranagar Metro Station" required>
+                                    <input type="text" name="pickup_address" class="form-control" placeholder="e.g. Tirunelveli Junction / Nellai Town" required>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <label class="form-label small fw-bold text-uppercase">Drop Destination *</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light text-danger"><i class="bi bi-pin-map-fill"></i></span>
-                                    <input type="text" name="drop_address" class="form-control" placeholder="e.g. Kempegowda Airport (BLR)" required>
+                                    <input type="text" name="drop_address" class="form-control" placeholder="e.g. Madurai Airport / Chennai CMBT" required>
                                 </div>
                             </div>
                         </div>
@@ -182,17 +182,17 @@
                                 <select name="vehicle_type" class="form-select" required>
                                     <option value="Mini">Mini (Hatchback)</option>
                                     <option value="Sedan" selected>Sedan</option>
-                                    <option value="SUV">SUV (Innova / 6-Seater)</option>
-                                    <option value="Premium">Premium Luxury</option>
+                                    <option value="SUV">SUV (Innova / Ertiga)</option>
+                                    <option value="Premium">Premium (Innova Crysta)</option>
                                 </select>
                             </div>
                             <div class="col-sm-4">
                                 <label class="form-label small fw-bold text-uppercase">Est. Distance (KM)</label>
-                                <input type="number" name="distance_km" class="form-control" value="15" step="0.5" required>
+                                <input type="number" name="distance_km" class="form-control" value="155" step="0.5" required>
                             </div>
                             <div class="col-sm-4">
                                 <label class="form-label small fw-bold text-uppercase">Total Fare (₹)</label>
-                                <input type="number" name="total_fare" class="form-control" value="350" step="10" required>
+                                <input type="number" name="total_fare" class="form-control" value="2270" step="10" required>
                             </div>
                         </div>
 
@@ -201,17 +201,14 @@
                                 <label class="form-label small fw-bold text-uppercase">Payment Method</label>
                                 <select name="payment_method" class="form-select">
                                     <option value="cash" selected>💵 Cash on Delivery (Cash to Driver)</option>
-                                    <option value="gpay">📱 Google Pay (GPay / UPI QR)</option>
-                                    <option value="upi">📲 PhonePe / Paytm / UPI</option>
+                                    <option value="upi">📲 UPI / Google Pay / PhonePe (QR Scanner)</option>
                                 </select>
-                                <small class="text-muted">Driver will collect or verify this payment</small>
+                                <small class="text-muted">Payment mode selected by customer</small>
                             </div>
                             <div class="col-sm-6">
-                                <label class="form-label small fw-bold text-uppercase">Dispatch Target / Driver Assignment</label>
-                                <select name="driver_id" id="modal-dispatch-driver-select" class="form-select">
-                                    <option value="">⚡ Broadcast to Available Drivers Pool (Open for Drivers to Request)</option>
-                                </select>
-                                <small class="text-muted">Choose a driver to assign directly, or broadcast to all</small>
+                                <label class="form-label small fw-bold text-uppercase">Dispatch / Driver Share Note</label>
+                                <input type="text" name="driver_notes" class="form-control" placeholder="e.g. Share to WhatsApp Driver Group">
+                                <small class="text-muted">You can click 'Share' in the table to send trip sheet to any driver on WhatsApp</small>
                             </div>
                         </div>
 

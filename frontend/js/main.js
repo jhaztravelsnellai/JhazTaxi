@@ -64,17 +64,10 @@ function updateNavbarAuthState() {
         if (user.role === 'admin' || user.is_staff) {
             dashboardLink = '/admin/dashboard.html';
             roleLinks = `
-                <li><a class="dropdown-item" href="/admin/bookings.html"><i class="bi bi-journal-text me-2"></i>Bookings</a></li>
-                <li><a class="dropdown-item" href="/admin/driver-requests.html"><i class="bi bi-send-check me-2"></i>Driver Requests</a></li>
-                <li><a class="dropdown-item" href="/admin/drivers.html"><i class="bi bi-person-badge me-2"></i>Drivers</a></li>
-                <li><a class="dropdown-item" href="/admin/reports.html"><i class="bi bi-graph-up me-2"></i>Reports</a></li>
-            `;
-        } else if (user.role === 'driver') {
-            dashboardLink = '/driver/dashboard.html';
-            roleLinks = `
-                <li><a class="dropdown-item" href="/driver/dashboard.html"><i class="bi bi-car-front me-2"></i>Available Pool</a></li>
-                <li><a class="dropdown-item" href="/driver/dashboard.html#assigned"><i class="bi bi-check-circle me-2"></i>My Assigned Rides</a></li>
-                <li><a class="dropdown-item" href="/driver/dashboard.html#requests"><i class="bi bi-clock-history me-2"></i>My Requests</a></li>
+                <li><a class="dropdown-item" href="/admin/bookings.html"><i class="bi bi-journal-text me-2"></i>Customer Bookings</a></li>
+                <li><a class="dropdown-item" href="/admin/vehicles.html"><i class="bi bi-car-front me-2"></i>Vehicles Fleet</a></li>
+                <li><a class="dropdown-item" href="/admin/fares.html"><i class="bi bi-tag me-2"></i>Fares & QR</a></li>
+                <li><a class="dropdown-item" href="/admin/payments.html"><i class="bi bi-credit-card me-2"></i>Payments</a></li>
             `;
         }
 

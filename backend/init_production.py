@@ -43,48 +43,48 @@ def init_production():
     if Vehicle.objects.count() == 0:
         fleet = [
             {
-                'name': 'Hyundai Grand i10',
+                'name': 'Maruti Swift / WagonR (AC Mini)',
                 'vehicle_type': 'Mini',
-                'vehicle_number': 'KA-01-MJ-1001',
+                'vehicle_number': 'TN-72-BK-6104',
                 'model': '2024',
                 'capacity': 4,
                 'base_fare': Decimal('80.00'),
                 'price_per_km': Decimal('12.00'),
                 'image_url': 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80',
-                'description': 'Pocket-friendly rides for daily quick city commutes with full AC.'
+                'description': 'Economical AC hatchback for brisk city transit and budget one-way travels.'
             },
             {
-                'name': 'Honda City Deluxe',
+                'name': 'Maruti Dzire / Toyota Etios (AC Sedan)',
                 'vehicle_type': 'Sedan',
-                'vehicle_number': 'KA-01-MJ-2002',
+                'vehicle_number': 'TN-72-AX-4521',
                 'model': '2024',
                 'capacity': 4,
                 'base_fare': Decimal('100.00'),
-                'price_per_km': Decimal('15.00'),
+                'price_per_km': Decimal('14.00'),
                 'image_url': 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=600&q=80',
-                'description': 'Spacious and comfortable sedans with generous boot space for airport & outstation.'
+                'description': 'Comfortable air-conditioned sedan, perfect for outstation one-way drops, business, and family commutes.'
             },
             {
-                'name': 'Toyota Innova Crysta',
+                'name': 'Toyota Innova / Ertiga (AC SUV)',
                 'vehicle_type': 'SUV',
-                'vehicle_number': 'KA-01-MJ-3003',
+                'vehicle_number': 'TN-72-BZ-8812',
                 'model': '2024',
                 'capacity': 6,
                 'base_fare': Decimal('150.00'),
                 'price_per_km': Decimal('20.00'),
                 'image_url': 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80',
-                'description': 'Large 6-seater premium SUV ideal for family trips, outstation, and heavy luggage.'
+                'description': 'Spacious 6-seater AC SUV with expansive boot space for family airport transfers and long outstation journeys.'
             },
             {
-                'name': 'Mercedes-Benz E-Class',
+                'name': 'Toyota Innova Crysta (Luxury 7+1 AC)',
                 'vehicle_type': 'Premium',
-                'vehicle_number': 'KA-01-MJ-4004',
-                'model': '2024',
-                'capacity': 4,
-                'base_fare': Decimal('250.00'),
-                'price_per_km': Decimal('35.00'),
+                'vehicle_number': 'TN-72-CY-3390',
+                'model': '2025',
+                'capacity': 7,
+                'base_fare': Decimal('200.00'),
+                'price_per_km': Decimal('24.00'),
                 'image_url': 'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=600&q=80',
-                'description': 'Luxury chauffeur-driven experience with top-tier comfort and executive amenities.'
+                'description': 'Executive luxury travel with plush captain seats, rear AC vents, and high-speed highway comfort.'
             }
         ]
 
@@ -121,10 +121,10 @@ def init_production():
     from payments.models import PaymentSetting
     p_set, created = PaymentSetting.objects.get_or_create(
         defaults={
-            'title': 'Official GPay / UPI Scanner',
-            'upi_id': 'jhaztaxi@upi',
-            'payee_name': 'JhazTaxi Travels',
-            'phone_number': '+91 98765 43210',
+            'title': 'Official Jhaz 1 Way Taxi UPI / GPay Scanner',
+            'upi_id': '9043519772@upi',
+            'payee_name': 'Jhaz 1 Way Taxi',
+            'phone_number': '9043519772',
             'instructions': 'Scan this official QR code using Google Pay, PhonePe, Paytm, or any BHIM UPI app. Show payment confirmation screen to your driver upon arrival or trip completion.',
             'is_active': True
         }
