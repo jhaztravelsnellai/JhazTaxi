@@ -130,7 +130,13 @@
             const grid = document.getElementById('fleet-vehicles-grid');
             const res = await fetchWithAuth(`${CONFIG.API_BASE_URL}/vehicles/`);
             if (res.ok && res.data.vehicles) {
-                const vehicles = res.data.vehicles;
+                const allowed = ['sedan', 'suv', 'innova crysta'];
+                const vehicles = res.data.vehicles.filter(v => 
+                    v.status === 'available' && allowed.includes((v.vehicle_type || '').toLowerCase())
+                );
+                const order = { 'sedan': 1, 'suv': 2, 'innova crysta': 3 };
+                vehicles.sort((a, b) => (order[(a.vehicle_type || '').toLowerCase()] || 99) - (order[(b.vehicle_type || '').toLowerCase()] || 99));
+
                 grid.innerHTML = vehicles.map(v => `
                     <div class="col-lg-4 col-md-6">
                         <div class="vehicle-card h-100 shadow-sm border-0">

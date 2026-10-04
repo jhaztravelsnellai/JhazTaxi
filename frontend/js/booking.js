@@ -136,6 +136,9 @@ async function loadVehicles() {
         availableVehicles = res.data.vehicles.filter(v => 
             v.status === 'available' && ['sedan', 'suv', 'innova crysta'].includes((v.vehicle_type || '').toLowerCase())
         );
+        const order = { 'sedan': 1, 'suv': 2, 'innova crysta': 3 };
+        availableVehicles.sort((a, b) => (order[(a.vehicle_type || '').toLowerCase()] || 99) - (order[(b.vehicle_type || '').toLowerCase()] || 99));
+
         renderVehicleCards(availableVehicles);
     } else {
         container.innerHTML = '<div class="alert alert-warning">Unable to load vehicles from server. Please ensure the backend is running.</div>';

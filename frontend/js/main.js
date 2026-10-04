@@ -5,6 +5,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     updateNavbarAuthState();
     setupFooterYear();
+    renderFloatingContactWidget();
+    loadHomepageVehicleRates();
 });
 
 // Helper for authenticated API calls
@@ -144,6 +146,90 @@ function renderFloatingContactWidget() {
     document.body.appendChild(container);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    renderFloatingContactWidget();
-});
+// Dynamically synchronizes vehicle rates on homepage (both dropdown & categories showcase)
+async function loadHomepageVehicleRates() {
+    const categoriesContainer = document.getElementById('home-vehicle-categories-container');
+    const heroSelect = document.getElementById('hero-vehicle-select');
+
+    if (!categoriesContainer && !heroSelect) return;
+
+    try {
+        const res = await fetchWithAuth(`${CONFIG.API_BASE_URL}/vehicles/`);
+        if (res.ok && res.data.vehicles) {
+            const allowed = ['sedan', 'suv', 'innova crysta'];
+            const vehicles = res.data.vehicles.filter(v => 
+                v.status === 'available' && allowed.includes((v.vehicle_type || '').toLowerCase())
+            );
+
+            // Sort: Sedan -> SUV -> Innova Crysta
+            const order = { 'sedan': 1, 'suv': 2, 'innova crysta': 3 };
+            vehicles.sort((a, b) => (order[(a.vehicle_type || '').toLowerCase()] || 99) - (order[(b.vehicle_type || '').toLowerCase()] || 99));
+
+            if (vehicles.length === 0) return;
+
+            // 1. Update Hero Quick Booking Dropdown
+            if (heroSelect) {
+                const currentVal = heroSelect.value || 'Sedan';
+                heroSelect.innerHTML = vehicles.map(v => {
+                    const pricePerKm = parseFloat(v.price_per_km || 0).toFixed(0);
+                    const isSelected = v.vehicle_type.toLowerCase() === currentVal.toLowerCase() ? 'selected' : '';
+                    return `<option value="${v.vehicle_type}" ${isSelected}>${v.vehicle_type} (₹${pricePerKm}/KM)</option>`;
+                }).join('');
+            }
+
+            // 2. Update Homepage Vehicle Categories Showcase
+            if (categoriesContainer) {
+                categoriesContainer.innerHTML = vehicles.map(v => {
+                    const vt = (v.vehicle_type || '').toLowerCase();
+                    let pillClass = 'bg-warning text-dark';
+                    let subtitle = 'Up to 4 Passengers &bull; AC &bull; Large Boot';
+                    let desc = v.description || 'Comfortable, air-conditioned sedan tailored for outstation one-way drops, airport runs, and city commutes.';
+                    let img = v.image_url || 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=800&q=80';
+
+                    if (vt.includes('crysta')) {
+                        pillClass = 'bg-dark text-warning';
+                        subtitle = 'Up to 7 Passengers &bull; Captain Seats AC';
+                        img = v.image_url || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80';
+                    } else if (vt.includes('suv')) {
+                        subtitle = 'Up to 6 Passengers &bull; Dual AC &bull; Spacious';
+                        img = v.image_url || 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80';
+                    }
+
+                    const pricePerKm = parseFloat(v.price_per_km || 14).toFixed(0);
+                    const minFare = (130 * parseFloat(pricePerKm) + 400).toFixed(0);
+
+                    return `
+                        <div class="col-lg-4 col-md-6">
+                            <div class="vehicle-card h-100 shadow-sm border-0">
+                                <div class="vehicle-img-wrapper" style="height: 200px;">
+                                    <span class="vehicle-type-pill fs-6 px-3 py-1 ${pillClass}">${v.vehicle_type}</span>
+                                    <img src="${img}" alt="${v.name}" onerror="this.src='https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=800&q=80'">
+                                </div>
+                                <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
+                                    <div>
+                                        <h4 class="fw-bold mb-1">${v.name}</h4>
+                                        <div class="text-muted mb-2"><i class="bi bi-people-fill me-1"></i> ${subtitle}</div>
+                                        <p class="text-muted small">${desc}</p>
+                                        <div class="d-flex flex-wrap gap-1 mb-2">
+                                            <span class="badge bg-warning-subtle text-dark border border-warning" style="font-size: 0.72rem;">Min 130 KM Base</span>
+                                            <span class="badge bg-light text-dark border" style="font-size: 0.72rem;">Driver Bata ₹400</span>
+                                        </div>
+                                    </div>
+                                    <div class="border-top pt-3 d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong class="text-dark fs-3">₹${pricePerKm}</strong><span class="text-muted">/KM</span>
+                                            <div class="small text-muted" style="font-size: 0.75rem;">Min 130 KM: ₹${minFare}</div>
+                                        </div>
+                                        <a href="/booking.html?vehicle=${encodeURIComponent(v.vehicle_type)}" class="btn btn-yellow px-3 fw-bold">Book ${v.vehicle_type} &rarr;</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+    } catch (err) {
+        console.warn('Error fetching homepage vehicle rates:', err);
+    }
+}
