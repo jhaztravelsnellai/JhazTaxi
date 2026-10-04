@@ -5,14 +5,27 @@ from drivers.serializers import DriverSerializer
 from users.serializers import UserSerializer
 
 class BookingSerializer(serializers.ModelSerializer):
-    customer_name = serializers.CharField(source='customer.get_full_name', read_only=True)
+    customer_name = serializers.SerializerMethodField()
     customer_email = serializers.CharField(source='customer.email', read_only=True)
-    customer_phone = serializers.CharField(source='customer.phone_number', read_only=True)
+    customer_phone = serializers.SerializerMethodField()
     vehicle_details = VehicleSerializer(source='vehicle', read_only=True)
     driver_details = DriverSerializer(source='driver', read_only=True)
     driver_requests_count = serializers.SerializerMethodField()
     my_request_status = serializers.SerializerMethodField()
     has_review = serializers.SerializerMethodField()
+
+    def get_customer_name(self, obj):
+        if obj.customer:
+            name = (obj.customer.get_full_name() or obj.customer.first_name or '').strip()
+            if name:
+                return name
+            return obj.customer.username
+        return "Customer"
+
+    def get_customer_phone(self, obj):
+        if obj.customer and obj.customer.phone_number:
+            return obj.customer.phone_number
+        return ""
 
     class Meta:
         model = Booking

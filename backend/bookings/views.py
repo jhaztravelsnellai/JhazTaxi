@@ -16,11 +16,11 @@ from users.models import User
 
 @api_view(['GET', 'POST'])
 def booking_list_create_view(request):
-    if not request.user.is_authenticated:
-        return Response({'success': False, 'message': 'Authentication required to access bookings'}, status=status.HTTP_401_UNAUTHORIZED)
-
-    # GET Bookings
+    # GET Bookings (requires login for security)
     if request.method == 'GET':
+        if not request.user.is_authenticated:
+            return Response({'success': False, 'message': 'Authentication required to access bookings'}, status=status.HTTP_401_UNAUTHORIZED)
+
         user = request.user
         queryset = Booking.objects.select_related('customer', 'driver', 'vehicle').all()
 
@@ -49,6 +49,7 @@ def booking_list_create_view(request):
                     Q(customer__first_name__icontains=search) |
                     Q(customer__last_name__icontains=search) |
                     Q(customer__email__icontains=search) |
+                    Q(customer__phone_number__icontains=search) |
                     Q(pickup_address__icontains=search) |
                     Q(drop_address__icontains=search) |
                     Q(driver__name__icontains=search)
@@ -57,28 +58,79 @@ def booking_list_create_view(request):
         serializer = BookingSerializer(queryset, many=True)
         return Response({'success': True, 'bookings': serializer.data})
 
-    # POST - Create New Booking
+    # POST - Create New Booking (Open to ALL Customers without login / signup)
     data = request.data
+    customer_name = str(data.get('customer_name') or data.get('name') or '').strip()
+    customer_phone = str(data.get('customer_phone') or data.get('phone') or '').strip()
+
+    if request.user.is_authenticated:
+        customer_user = request.user
+        if customer_name and (not customer_user.first_name or customer_user.first_name == 'Customer'):
+            customer_user.first_name = customer_name
+            customer_user.save(update_fields=['first_name'])
+        if customer_phone and not customer_user.phone_number:
+            customer_user.phone_number = customer_phone
+            customer_user.save(update_fields=['phone_number'])
+    else:
+        # Public guest booking
+        if not customer_phone:
+            return Response({'success': False, 'message': 'Mobile phone number is required to book a taxi'}, status=status.HTTP_400_BAD_REQUEST)
+
+        digits_phone = ''.join(filter(str.isdigit, customer_phone))[-10:]
+        if not digits_phone:
+            digits_phone = '9043519772'
+
+        clean_username = f"guest_{digits_phone}"
+        clean_email = f"{digits_phone}@jhaz1waytaxi.in"
+
+        customer_user = User.objects.filter(
+            Q(phone_number=customer_phone) | Q(phone_number=digits_phone) | Q(username=clean_username) | Q(email=clean_email)
+        ).first()
+
+        if not customer_user:
+            customer_user = User(
+                username=clean_username,
+                email=clean_email,
+                phone_number=customer_phone,
+                first_name=customer_name or 'Customer',
+                role='customer'
+            )
+            customer_user.set_unusable_password()
+            customer_user.save()
+        else:
+            if customer_name and (not customer_user.first_name or customer_user.first_name == 'Customer'):
+                customer_user.first_name = customer_name
+                customer_user.save(update_fields=['first_name'])
+            if not customer_user.phone_number:
+                customer_user.phone_number = customer_phone
+                customer_user.save(update_fields=['phone_number'])
+
     vehicle_id = data.get('vehicle_id') or data.get('vehicle')
     vehicle = None
     if vehicle_id:
         try:
             vehicle = Vehicle.objects.get(id=vehicle_id)
-        except Vehicle.DoesNotExist:
-            return Response({'success': False, 'message': 'Selected vehicle does not exist'}, status=status.HTTP_404_NOT_FOUND)
-    elif data.get('vehicle_type'):
+        except (Vehicle.DoesNotExist, ValueError):
+            pass
+
+    if not vehicle and data.get('vehicle_type'):
         vehicle = Vehicle.objects.filter(vehicle_type__iexact=data.get('vehicle_type'), status='available').first() or \
                   Vehicle.objects.filter(vehicle_type__iexact=data.get('vehicle_type')).first()
 
     if not vehicle:
-        return Response({'success': False, 'message': 'Vehicle is required (specify vehicle_id or vehicle_type)'}, status=status.HTTP_400_BAD_REQUEST)
+        # Fallback to Sedan or first available vehicle
+        vehicle = Vehicle.objects.filter(status='available').first() or Vehicle.objects.first()
+
+    if not vehicle:
+        return Response({'success': False, 'message': 'No vehicles available. Please contact 9043519772.'}, status=status.HTTP_400_BAD_REQUEST)
 
     # Distance and Duration
     try:
         distance_km = Decimal(str(data.get('distance_km', 10.0)))
         duration_mins = int(data.get('duration_mins', 20))
     except Exception:
-        return Response({'success': False, 'message': 'Invalid distance or duration format'}, status=status.HTTP_400_BAD_REQUEST)
+        distance_km = Decimal('10.00')
+        duration_mins = 20
 
     passengers = int(data.get('passengers', 1))
     pickup_date = data.get('pickup_date') or str(date.today())
@@ -123,7 +175,7 @@ def booking_list_create_view(request):
         total_fare = min_fare
 
     booking = Booking.objects.create(
-        customer=request.user,
+        customer=customer_user,
         vehicle=vehicle,
         pickup_address=data.get('pickup_address', 'Pickup Location'),
         pickup_lat=data.get('pickup_lat'),
@@ -157,9 +209,12 @@ def booking_list_create_view(request):
         payment_status='pending'
     )
 
+    disp_name = customer_name or customer_user.get_full_name() or customer_user.first_name or 'Customer'
+    disp_phone = customer_phone or customer_user.phone_number or ''
+
     # Customer notification
     Notification.objects.create(
-        user=request.user,
+        user=customer_user,
         booking=booking,
         title="Booking Request Received",
         message=f"Your ride request {booking.booking_id} has been placed. Waiting for driver assignment.",
@@ -173,22 +228,49 @@ def booking_list_create_view(request):
             user=adm,
             booking=booking,
             title=f"New Booking: {booking.booking_id}",
-            message=f"New booking from {request.user.get_full_name() or request.user.username} for {vehicle.vehicle_type} (Rs.{booking.total_fare}).",
+            message=f"New booking from {disp_name} ({disp_phone}) for {vehicle.vehicle_type} (₹{booking.total_fare}).",
             notification_type='booking_created'
         )
+
+    # Build WhatsApp URL for 9043519772
+    whatsapp_text = (
+        f"🚕 *NEW BOOKING - JHAZ 1 WAY TAXI*\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"🆔 *Booking ID:* {booking.booking_id}\n"
+        f"👤 *Customer Name:* {disp_name}\n"
+        f"📞 *Mobile Number:* {disp_phone}\n"
+        f"📍 *Pickup Location:* {booking.pickup_address}\n"
+        f"🏁 *Drop Destination:* {booking.drop_address}\n"
+        f"📅 *Date & Time:* {booking.pickup_date} at {booking.pickup_time}\n"
+        f"🚗 *Vehicle Type:* {vehicle.vehicle_type} ({vehicle.name})\n"
+        f"👥 *Passengers:* {booking.passengers}\n"
+        f"🛣️ *Distance:* {booking.distance_km} KM\n"
+        f"💰 *Total Fare:* ₹{booking.total_fare}\n"
+        f"💳 *Payment Mode:* {booking.payment_method.upper()}\n"
+    )
+    if booking.customer_notes:
+        whatsapp_text += f"📝 *Special Notes:* {booking.customer_notes}\n"
+    whatsapp_text += (
+        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"🚖 *Jhaz 1 Way Taxi*\n"
+        f"Dispatch & WhatsApp: 9043519772"
+    )
+
+    import urllib.parse
+    whatsapp_url = f"https://api.whatsapp.com/send?phone=919043519772&text={urllib.parse.quote(whatsapp_text)}"
 
     return Response({
         'success': True,
         'message': f'Booking created successfully! Your Booking ID is {booking.booking_id}',
-        'booking': BookingSerializer(booking).data
+        'booking': BookingSerializer(booking).data,
+        'whatsapp_url': whatsapp_url,
+        'whatsapp_number': '9043519772',
+        'contact_number': '9043519772'
     }, status=status.HTTP_201_CREATED)
 
 
 @api_view(['GET', 'DELETE'])
 def booking_detail_view(request, pk):
-    if not request.user.is_authenticated:
-        return Response({'success': False, 'message': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
-
     try:
         # pk can be integer ID or booking_id string (e.g. JHZ-000001)
         if str(pk).isdigit():
@@ -198,15 +280,11 @@ def booking_detail_view(request, pk):
     except Booking.DoesNotExist:
         return Response({'success': False, 'message': 'Booking not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    # Permission check: customer can only see their own booking, unless admin/staff
-    if request.user.role == 'customer' and not request.user.is_staff and booking.customer != request.user:
-        return Response({'success': False, 'message': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
-
     if request.method == 'GET':
         return Response({'success': True, 'booking': BookingSerializer(booking).data})
 
     if request.method == 'DELETE':
-        if request.user.role != 'admin' and not request.user.is_staff:
+        if not request.user.is_authenticated or (request.user.role != 'admin' and not request.user.is_staff):
             return Response({'success': False, 'message': 'Admin permission required'}, status=status.HTTP_403_FORBIDDEN)
         booking.delete()
         return Response({'success': True, 'message': 'Booking deleted successfully'})

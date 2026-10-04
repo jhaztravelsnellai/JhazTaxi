@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book a Taxi Online - Instant Fare & Real-Time Map | JhazTaxi</title>
-    <meta name="description" content="Book your taxi online with JhazTaxi. Interactive GPS map routing, exact road distance calculation, instant transparent fare estimates, and verified professional drivers.">
-    <meta name="keywords" content="book taxi online, instant cab booking, airport taxi, sedan cab, SUV taxi, fare estimate, JhazTaxi booking">
+    <title>Book Jhaz 1 Way Taxi Online | Jhaz 1 Way Taxi - 9043519772</title>
+    <meta name="description" content="Book your taxi online with Jhaz 1 Way Taxi. Instant road distance fare, verified drivers, and direct WhatsApp dispatch to 9043519772. No login required!">
+    <meta name="keywords" content="jhaz 1 way taxi, one way cab, book taxi online, outstation taxi, 9043519772">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://jhaztaxi.com/booking.html">
 
@@ -69,9 +69,6 @@
 
     <script src="/js/config.js"></script>
     <script src="/js/auth.js"></script>
-    <script>
-        requireAuth();
-    </script>
 </head>
 <body>
 
@@ -80,7 +77,7 @@
         <div class="container">
             <a class="navbar-brand navbar-brand-jhaz" href="/index.html">
                 <span class="brand-badge">JH</span>
-                <span>JhazTaxi</span>
+                <span>Jhaz 1 Way Taxi</span>
             </a>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
                 <span class="navbar-toggler-icon"></span>
@@ -94,8 +91,8 @@
                     <li class="nav-item"><a class="nav-link nav-link-jhaz" href="/contact.html">Contact</a></li>
                 </ul>
                 <div class="d-flex align-items-center gap-2" id="navbar-auth-section">
-                    <a href="/login.html" class="btn btn-outline-yellow btn-sm">Login</a>
-                    <a href="/register.html" class="btn btn-yellow btn-sm">Register</a>
+                    <a href="tel:9043519772" class="btn btn-outline-yellow btn-sm text-nowrap"><i class="bi bi-telephone-fill me-1"></i> 9043519772</a>
+                    <a href="https://wa.me/919043519772?text=Hello%20Jhaz%201%20Way%20Taxi%2C%20I%20want%20to%20book%20a%20cab." target="_blank" class="btn btn-success btn-sm text-nowrap fw-bold"><i class="bi bi-whatsapp me-1"></i> WhatsApp</a>
                 </div>
             </div>
         </div>
@@ -104,18 +101,59 @@
     <!-- MAIN BOOKING WORKFLOW -->
     <main class="booking-container">
         <div class="container">
+            <!-- 24/7 Helpline & WhatsApp Notice Banner -->
+            <div class="alert alert-warning border-0 shadow-sm rounded-4 d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4 p-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-warning text-dark p-2 text-center" style="width: 44px; height: 44px; line-height: 28px;">
+                        <i class="bi bi-telephone-inbound-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark fs-6">Direct Call & WhatsApp Booking: <span class="text-primary text-decoration-underline">9043519772</span></div>
+                        <div class="text-muted small">No signup or login required! Enter your details below to book instantly online or directly on WhatsApp.</div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="tel:9043519772" class="btn btn-dark btn-sm fw-bold"><i class="bi bi-telephone-fill me-1"></i> Call 9043519772</a>
+                    <a href="https://wa.me/919043519772?text=Hello%20Jhaz%201%20Way%20Taxi%2C%20I%20want%20to%20book%20a%20ride." target="_blank" class="btn btn-success btn-sm fw-bold"><i class="bi bi-whatsapp me-1"></i> WhatsApp</a>
+                </div>
+            </div>
+
             <div class="text-center mb-4">
                 <h1 class="display-6 fw-bold">Book Your Ride in Minutes</h1>
-                <p class="text-muted">Enter locations, verify road route, select vehicle, and confirm your taxi.</p>
+                <p class="text-muted">Fill in your contact, pickup and drop destination. Instant confirmation & direct WhatsApp dispatch!</p>
             </div>
 
             <div class="row g-4">
                 <!-- Left: Route Form & Vehicle Selection -->
                 <div class="col-lg-6">
                     <div class="card border-0 shadow-sm p-4 rounded-4 mb-4">
-                        <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
-                            <span class="badge bg-warning text-dark">Step 1</span> Route & Schedule
-                        </h5>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                                <span class="badge bg-warning text-dark">Step 1</span> Customer Details & Route
+                            </h5>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-unlock-fill me-1"></i> Open Booking</span>
+                        </div>
+
+                        <!-- Customer Details (Name & Mobile) -->
+                        <div class="p-3 bg-light rounded-3 mb-3 border">
+                            <div class="row g-2">
+                                <div class="col-sm-6">
+                                    <label class="form-label small fw-bold text-uppercase">Your Name <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="bi bi-person-fill text-warning"></i></span>
+                                        <input type="text" id="customer-name" class="form-control" placeholder="Enter your full name" required>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label small fw-bold text-uppercase">Mobile Number (WhatsApp) <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="bi bi-telephone-fill text-warning"></i></span>
+                                        <input type="tel" id="customer-phone" class="form-control" placeholder="e.g. 9043519772" maxlength="15" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="text-muted d-block mt-2"><i class="bi bi-shield-check text-success me-1"></i> No password or login required. We will reach you on this number.</small>
+                        </div>
 
                         <!-- Pickup Location -->
                         <div class="mb-3 location-input-group">
@@ -207,7 +245,7 @@
     <!-- FOOTER -->
     <footer class="footer-jhaz">
         <div class="container text-center text-muted small">
-            &copy; 2026 JhazTaxi. Clean, reliable, and production-ready taxi booking application.
+            &copy; 2026 Jhaz 1 Way Taxi. 24/7 Helpline & WhatsApp: <strong class="text-white"><a href="tel:9043519772" class="text-white text-decoration-none">9043519772</a></strong>. Affordable, reliable, and verified one way cab services.
         </div>
     </footer>
 

@@ -42,6 +42,52 @@ async function loadAdminDashboard() {
     if (typeof Chart !== 'undefined' && s.charts) {
         renderAdminCharts(s.charts);
     }
+
+    // Load Live Recent Customer Bookings onto Dashboard
+    const dashTbody = document.getElementById('dashboard-recent-bookings-tbody');
+    if (dashTbody) {
+        const bRes = await fetchWithAuth(`${CONFIG.API_BASE_URL}/bookings/?status=all`);
+        if (bRes.ok && bRes.data.bookings) {
+            const bookings = bRes.data.bookings;
+            window.currentAdminBookings = bookings;
+            const recent = bookings.slice(0, 8);
+            if (recent.length === 0) {
+                dashTbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">No customer bookings placed yet.</td></tr>`;
+            } else {
+                dashTbody.innerHTML = recent.map(b => {
+                    const cleanPhone = (b.customer_phone || '').replace(/\D/g, '');
+                    const vType = b.vehicle_details?.vehicle_type || 'Cab';
+                    return `
+                    <tr>
+                        <td class="fw-bold"><span class="text-primary font-monospace">${b.booking_id}</span></td>
+                        <td>
+                            <strong class="text-dark">${b.customer_name || 'Customer'}</strong><br>
+                            <a href="tel:${b.customer_phone}" class="small text-decoration-none fw-semibold text-dark"><i class="bi bi-telephone-fill text-warning me-1"></i>${b.customer_phone || ''}</a>
+                        </td>
+                        <td>
+                            <div class="small fw-semibold text-truncate" style="max-width: 200px;" title="${b.pickup_address}"><i class="bi bi-circle-fill text-success me-1"></i>${b.pickup_address}</div>
+                            <div class="small text-muted text-truncate" style="max-width: 200px;" title="${b.drop_address}"><i class="bi bi-square-fill text-danger me-1"></i>${b.drop_address}</div>
+                        </td>
+                        <td><div class="fw-bold">${b.pickup_date}</div><small class="text-muted"><i class="bi bi-clock me-1"></i>${b.pickup_time}</small></td>
+                        <td><span class="badge bg-light text-dark border">${vType}</span><div class="small text-muted mt-1">${b.distance_km} KM</div></td>
+                        <td class="fw-bold text-success fs-6">${adminCurrency(b.total_fare)}</td>
+                        <td>${renderStatusBadge(b.status)}</td>
+                        <td class="text-center">
+                            <div class="btn-group shadow-sm" role="group">
+                                <button class="btn btn-sm btn-success fw-bold px-2 py-1 d-inline-flex align-items-center gap-1" onclick="shareBookingWhatsApp('${b.booking_id}')" title="Send ride details via WhatsApp to any driver or contact">
+                                    <i class="bi bi-whatsapp"></i> Share
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary px-2 py-1" onclick="copyTripDetails('${b.booking_id}')" title="Copy trip details to clipboard">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    `;
+                }).join('');
+            }
+        }
+    }
 }
 
 function renderAdminCharts(chartsData) {
@@ -101,8 +147,75 @@ function renderAdminCharts(chartsData) {
     }
 }
 
-// 2. Admin Bookings Controller
-let activeAssignBookingId = null;
+// 2. Admin Bookings Controller with WhatsApp Dispatch & Multi-Driver Sharing
+window.currentAdminBookings = [];
+
+function renderStatusBadge(status) {
+    const s = (status || '').toLowerCase();
+    switch (s) {
+        case 'pending':
+            return '<span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Pending</span>';
+        case 'confirmed':
+            return '<span class="badge bg-primary"><i class="bi bi-check-circle me-1"></i>Confirmed</span>';
+        case 'trip_started':
+            return '<span class="badge bg-info text-dark"><i class="bi bi-car-front me-1"></i>On Trip</span>';
+        case 'trip_completed':
+            return '<span class="badge bg-success"><i class="bi bi-check2-all me-1"></i>Completed</span>';
+        case 'cancelled':
+            return '<span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Cancelled</span>';
+        default:
+            return `<span class="badge bg-secondary">${status}</span>`;
+    }
+}
+
+function getBookingShareText(b) {
+    const vType = b.vehicle_details?.vehicle_type || 'Cab';
+    const vName = b.vehicle_details?.name ? `(${b.vehicle_details.name})` : '';
+    return `🚕 *JHAZ 1 WAY TAXI - TRIP DISPATCH*\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `🆔 *Booking ID:* ${b.booking_id}\n` +
+        `👤 *Customer Name:* ${b.customer_name || 'Customer'}\n` +
+        `📞 *Customer Mobile:* ${b.customer_phone || 'N/A'}\n` +
+        `📍 *Pickup Location:* ${b.pickup_address}\n` +
+        `🏁 *Drop Destination:* ${b.drop_address}\n` +
+        `📅 *Pickup Schedule:* ${b.pickup_date} at ${b.pickup_time}\n` +
+        `🚗 *Vehicle Type:* ${vType} ${vName}\n` +
+        `👥 *Passengers:* ${b.passengers || 1}\n` +
+        `🛣️ *Est. Distance:* ${b.distance_km} KM\n` +
+        `💰 *Total Fare:* ₹${b.total_fare}\n` +
+        `💳 *Payment Mode:* ${(b.payment_method || 'CASH').toUpperCase()}\n` +
+        (b.customer_notes ? `📝 *Special Notes:* ${b.customer_notes}\n` : '') +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `📞 *Jhaz 1 Way Taxi Helpline:* 9043519772`;
+}
+
+function shareBookingWhatsApp(bookingId) {
+    const b = (window.currentAdminBookings || []).find(x => x.booking_id === bookingId);
+    if (!b) {
+        showToast('Booking details not found in active list.', 'error');
+        return;
+    }
+    const text = getBookingShareText(b);
+    try {
+        navigator.clipboard.writeText(text);
+    } catch (e) {}
+
+    showToast('Trip details copied & opening WhatsApp to share with any driver!', 'success');
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+}
+
+function copyTripDetails(bookingId) {
+    const b = (window.currentAdminBookings || []).find(x => x.booking_id === bookingId);
+    if (!b) return;
+    const text = getBookingShareText(b);
+    try {
+        navigator.clipboard.writeText(text);
+        showToast('Trip details copied to clipboard!', 'info');
+    } catch (e) {
+        showToast('Unable to copy to clipboard', 'warning');
+    }
+}
 
 async function loadAdminBookings() {
     requireAdmin();
@@ -114,7 +227,7 @@ async function loadAdminBookings() {
     const filterType = document.getElementById('filter-booking-type')?.value || '';
     const search = document.getElementById('filter-booking-search')?.value.trim() || '';
 
-    tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4"><span class="spinner-border spinner-yellow"></span></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4"><span class="spinner-border spinner-yellow"></span></td></tr>`;
 
     let url = `${CONFIG.API_BASE_URL}/bookings/?status=${filterStatus}`;
     if (filterType) url += `&filter=${filterType}`;
@@ -123,45 +236,71 @@ async function loadAdminBookings() {
     const res = await fetchWithAuth(url);
     if (res.ok && res.data.bookings) {
         const bookings = res.data.bookings;
+        window.currentAdminBookings = bookings;
+
         if (bookings.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-muted">No bookings match the selected criteria.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted">No bookings match the selected criteria.</td></tr>`;
             return;
         }
 
-        tbody.innerHTML = bookings.map(b => `
+        tbody.innerHTML = bookings.map(b => {
+            const cleanPhone = (b.customer_phone || '').replace(/\D/g, '');
+            const vType = b.vehicle_details?.vehicle_type || 'Cab';
+            return `
             <tr>
-                <td class="fw-bold">${b.booking_id}</td>
-                <td>
-                    <strong>${b.customer_name || 'Customer'}</strong><br>
-                    <small class="text-muted">${b.customer_phone || b.customer_email || ''}</small>
+                <td class="fw-bold">
+                    <span class="text-primary font-monospace">${b.booking_id}</span>
+                    <div class="small text-muted" style="font-size:0.75rem;">Placed: ${b.created_at ? new Date(b.created_at).toLocaleDateString('en-IN') : 'Recent'}</div>
                 </td>
                 <td>
-                    <div class="small fw-semibold text-truncate" style="max-width: 170px;" title="${b.pickup_address}"><i class="bi bi-circle-fill text-success me-1"></i>${b.pickup_address}</div>
-                    <div class="small text-muted text-truncate" style="max-width: 170px;" title="${b.drop_address}"><i class="bi bi-square-fill text-danger me-1"></i>${b.drop_address}</div>
+                    <strong class="text-dark">${b.customer_name || 'Customer'}</strong><br>
+                    <a href="tel:${b.customer_phone}" class="small text-decoration-none fw-semibold text-dark"><i class="bi bi-telephone-fill text-warning me-1"></i>${b.customer_phone || ''}</a>
+                    ${cleanPhone ? `
+                    <div class="mt-1">
+                        <a href="https://wa.me/91${cleanPhone}?text=Hello%20${encodeURIComponent(b.customer_name || 'Customer')}%2C%20regarding%20your%20Jhaz%201%20Way%20Taxi%20booking%20${b.booking_id}..." target="_blank" class="badge bg-success-subtle text-success border border-success text-decoration-none py-1">
+                            <i class="bi bi-whatsapp me-1"></i>Chat Customer
+                        </a>
+                    </div>` : ''}
                 </td>
-                <td>${b.pickup_date}<br><small class="text-muted">${b.pickup_time}</small></td>
-                <td>${b.distance_km} KM</td>
-                <td><span class="badge bg-light text-dark border">${b.vehicle_details?.vehicle_type || 'Vehicle'}</span></td>
                 <td>
-                    ${b.driver_details ? `
-                        <strong>${b.driver_details.name}</strong><br>
-                        <small class="text-muted">${b.driver_details.phone}</small>
-                    ` : `
-                        <button class="btn btn-sm btn-yellow py-0 px-2 fw-bold" onclick="openAssignDriverModal('${b.booking_id}')">
-                            <i class="bi bi-person-plus-fill me-1"></i> Assign
-                        </button>
-                    `}
+                    <div class="small fw-semibold text-truncate" style="max-width: 220px;" title="${b.pickup_address}">
+                        <i class="bi bi-circle-fill text-success me-1"></i>${b.pickup_address}
+                    </div>
+                    <div class="small text-muted text-truncate" style="max-width: 220px;" title="${b.drop_address}">
+                        <i class="bi bi-square-fill text-danger me-1"></i>${b.drop_address}
+                    </div>
                 </td>
-                <td class="fw-bold">${adminCurrency(b.total_fare)}</td>
+                <td>
+                    <div class="fw-bold">${b.pickup_date}</div>
+                    <small class="text-muted"><i class="bi bi-clock me-1"></i>${b.pickup_time}</small>
+                </td>
+                <td>
+                    <span class="badge bg-light text-dark border">${vType}</span>
+                    <div class="small text-muted mt-1"><i class="bi bi-signpost-split me-1"></i>${b.distance_km} KM</div>
+                </td>
+                <td>
+                    <div class="fw-bold text-success fs-6">${adminCurrency(b.total_fare)}</div>
+                    <span class="badge bg-secondary-subtle text-secondary small">${(b.payment_method || 'cash').toUpperCase()}</span>
+                </td>
                 <td>${renderStatusBadge(b.status)}</td>
+                <td class="text-center">
+                    <div class="btn-group shadow-sm" role="group">
+                        <button class="btn btn-sm btn-success fw-bold px-2 py-1 d-inline-flex align-items-center gap-1" onclick="shareBookingWhatsApp('${b.booking_id}')" title="Send ride details via WhatsApp to any driver or contact">
+                            <i class="bi bi-whatsapp"></i> Share
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary px-2 py-1" onclick="copyTripDetails('${b.booking_id}')" title="Copy trip details to clipboard">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                </td>
                 <td>
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-light border dropdown-toggle" type="button" data-bs-toggle="dropdown">Actions</button>
+                        <button class="btn btn-sm btn-light border dropdown-toggle py-1 px-2" type="button" data-bs-toggle="dropdown">
+                            Update
+                        </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow">
-                            <li><h6 class="dropdown-header">Manage Trip</h6></li>
-                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="openAssignDriverModal('${b.booking_id}')"><i class="bi bi-person-check me-2"></i>Assign/Reassign Driver</a></li>
+                            <li><h6 class="dropdown-header">Update Status</h6></li>
                             <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateStatus('${b.booking_id}', 'confirmed')"><i class="bi bi-check-circle me-2 text-primary"></i>Mark Confirmed</a></li>
-                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateStatus('${b.booking_id}', 'driver_arriving')"><i class="bi bi-geo me-2 text-info"></i>Driver Arriving</a></li>
                             <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateStatus('${b.booking_id}', 'trip_started')"><i class="bi bi-car-front me-2 text-warning"></i>Trip Started</a></li>
                             <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateStatus('${b.booking_id}', 'trip_completed')"><i class="bi bi-check2-all me-2 text-success"></i>Trip Completed</a></li>
                             <li><hr class="dropdown-divider"></li>
@@ -171,9 +310,10 @@ async function loadAdminBookings() {
                     </div>
                 </td>
             </tr>
-        `).join('');
+            `;
+        }).join('');
     } else {
-        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-danger">Failed to load bookings.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-danger">Failed to load bookings.</td></tr>`;
     }
 }
 

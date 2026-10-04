@@ -20,7 +20,7 @@ const CONFIG = {
     ),
 
     // App Branding
-    APP_NAME: 'JhazTaxi',
+    APP_NAME: 'Jhaz 1 Way Taxi',
     TAGLINE: 'Your Ride, Your Way.',
     CURRENCY_SYMBOL: '₹',
 

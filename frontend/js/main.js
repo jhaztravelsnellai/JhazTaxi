@@ -96,8 +96,8 @@ function updateNavbarAuthState() {
         `;
     } else {
         navAuthContainer.innerHTML = `
-            <a href="/login.html" class="btn btn-outline-yellow btn-sm"><i class="bi bi-person me-1"></i> Customer Login</a>
-            <a href="/driver/login.html" class="btn btn-warning text-dark btn-sm fw-bold"><i class="bi bi-car-front-fill me-1"></i> Driver Portal</a>
+            <a href="tel:9043519772" class="btn btn-outline-yellow btn-sm text-nowrap"><i class="bi bi-telephone-fill me-1"></i> 9043519772</a>
+            <a href="https://wa.me/919043519772?text=Hello%20Jhaz%201%20Way%20Taxi%2C%20I%20want%20to%20book%20a%20cab." target="_blank" class="btn btn-success btn-sm text-nowrap fw-bold"><i class="bi bi-whatsapp me-1"></i> WhatsApp</a>
         `;
     }
 }
@@ -123,7 +123,7 @@ async function handleGlobalLogout() {
         } else if (isDriverPage || isDriverUser) {
             window.location.href = '/driver/login.html';
         } else {
-            window.location.href = '/login.html';
+            window.location.href = '/index.html';
         }
     }, 400);
 }
@@ -132,3 +132,26 @@ function setupFooterYear() {
     const el = document.getElementById('current-year');
     if (el) el.textContent = new Date().getFullYear();
 }
+
+// Render 24/7 Floating WhatsApp & Call Buttons across the site
+function renderFloatingContactWidget() {
+    if (document.querySelector('.floating-contact-container')) return;
+
+    const container = document.createElement('div');
+    container.className = 'floating-contact-container';
+    container.innerHTML = `
+        <a href="https://wa.me/919043519772?text=Hello%20Jhaz%201%20Way%20Taxi%2C%20I%20want%20to%20book%20a%20cab." target="_blank" class="floating-btn floating-btn-whatsapp" title="Chat on WhatsApp (9043519772)" aria-label="WhatsApp 9043519772">
+            <i class="bi bi-whatsapp"></i>
+            <span class="floating-tooltip">WhatsApp: 9043519772</span>
+        </a>
+        <a href="tel:9043519772" class="floating-btn floating-btn-call" title="Call Dispatch (9043519772)" aria-label="Call 9043519772">
+            <i class="bi bi-telephone-fill"></i>
+            <span class="floating-tooltip">Call: 9043519772</span>
+        </a>
+    `;
+    document.body.appendChild(container);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderFloatingContactWidget();
+});

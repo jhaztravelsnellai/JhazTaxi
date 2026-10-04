@@ -1,6 +1,6 @@
 {
-  "name": "JhazTaxi - Premium Urban Taxi Booking",
-  "short_name": "JhazTaxi",
+  "name": "Jhaz 1 Way Taxi - One Way Cab Booking",
+  "short_name": "Jhaz 1 Way Taxi",
   "description": "Safe, reliable, and affordable taxi booking with instant upfront fare calculation and real-time cab tracking.",
   "start_url": "/index.html",
   "display": "standalone",

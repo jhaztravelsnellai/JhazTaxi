@@ -192,16 +192,14 @@ async function loadCustomerBookings(filterStatus = 'all') {
     }
 }
 
-// 3. Load Single Booking Details Page with Visual Timeline Stepper
+// 3. Load Single Booking Details Page with Visual Timeline Stepper (Supports guest and authenticated users)
 async function loadBookingDetails() {
-    requireAuth();
-
     const params = new URLSearchParams(window.location.search);
     const bookingId = params.get('id');
 
     if (!bookingId) {
         showToast('Invalid booking ID requested.', 'error');
-        setTimeout(() => window.location.href = '/user/bookings.html', 1000);
+        setTimeout(() => window.location.href = '/index.html', 1000);
         return;
     }
 

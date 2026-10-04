@@ -2,27 +2,25 @@
  * JhazTaxi - Authentication & Role-Based Route Guards
  */
 
-// Landing Page Guard: Requires login to view Home Page
+// Landing Page Guard: Open to all visitors (No customer login required)
 function checkLandingAuth() {
-    const token = getAuthToken();
     const user = getCurrentUser();
-
-    if (!token || !user) {
-        window.location.replace(`/login.html?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
-        return false;
-    }
-
-    // Role-specific landing redirects
-    if (user.role === 'driver') {
+    // Only redirect if a driver is logged in and visits home
+    if (user && user.role === 'driver') {
         window.location.replace('/driver/dashboard.html');
         return false;
     }
-
     return true;
 }
 
-// Protected Route Guard: Requires ANY authenticated user
+// Protected Route Guard: Requires authentication for internal portals
 function requireAuth() {
+    const path = window.location.pathname.toLowerCase();
+    // Public pages never require authentication
+    if (path.endsWith('booking.html') || path.endsWith('index.html') || path === '/' || path.endsWith('contact.html') || path.endsWith('vehicles.html') || path.endsWith('about.html')) {
+        return true;
+    }
+
     const token = getAuthToken();
     const user = getCurrentUser();
 

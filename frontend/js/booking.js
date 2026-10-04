@@ -65,6 +65,30 @@ function checkUrlBookingParams() {
     const pickup = params.get('pickup');
     const drop = params.get('drop');
     const vType = params.get('vehicle');
+    const name = params.get('name');
+    const phone = params.get('phone');
+
+    if (name) {
+        const nameEl = document.getElementById('customer-name');
+        if (nameEl) nameEl.value = name;
+    }
+    if (phone) {
+        const phoneEl = document.getElementById('customer-phone');
+        if (phoneEl) phoneEl.value = phone;
+    }
+
+    // If user is logged in, optionally pre-fill name and phone
+    const currentUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+    if (currentUser) {
+        const nameEl = document.getElementById('customer-name');
+        const phoneEl = document.getElementById('customer-phone');
+        if (nameEl && !nameEl.value) {
+            nameEl.value = currentUser.first_name ? `${currentUser.first_name} ${currentUser.last_name || ''}`.trim() : currentUser.username;
+        }
+        if (phoneEl && !phoneEl.value && currentUser.phone_number) {
+            phoneEl.value = currentUser.phone_number;
+        }
+    }
 
     if (pickup) {
         const input = document.getElementById('pickup-address');
@@ -271,17 +295,10 @@ function renderFareBreakdown(est) {
                     </label>
                 </div>
                 <div class="form-check p-3 border rounded-3 bg-light flex-grow-1">
-                    <input class="form-check-input ms-0 me-2" type="radio" name="payment_method" id="pay_gpay" value="gpay" onchange="currentBookingState.paymentMethod = 'gpay'; toggleGPayScannerBox(true)">
-                    <label class="form-check-label fw-bold text-dark" for="pay_gpay">
-                        <i class="bi bi-google me-1 text-primary fs-5 align-middle"></i> Google Pay (GPay)
-                        <small class="d-block text-muted fw-normal">Official Admin GPay QR Scanner</small>
-                    </label>
-                </div>
-                <div class="form-check p-3 border rounded-3 bg-light flex-grow-1">
                     <input class="form-check-input ms-0 me-2" type="radio" name="payment_method" id="pay_upi" value="upi" onchange="currentBookingState.paymentMethod = 'upi'; toggleGPayScannerBox(true)">
                     <label class="form-check-label fw-bold text-dark" for="pay_upi">
-                        <i class="bi bi-qr-code-scan me-1 text-info fs-5 align-middle"></i> PhonePe / Paytm / UPI
-                        <small class="d-block text-muted fw-normal">Official Admin UPI QR Scanner</small>
+                        <i class="bi bi-qr-code-scan me-1 text-primary fs-5 align-middle"></i> UPI / Google Pay / PhonePe
+                        <small class="d-block text-muted fw-normal">Official Admin QR Scanner & Instant Payment</small>
                     </label>
                 </div>
             </div>
@@ -296,7 +313,7 @@ function renderFareBreakdown(est) {
     `;
 }
 
-// Dynamic GPay Scanner display for customer
+// Dynamic GPay / UPI Scanner display for customer
 async function toggleGPayScannerBox(show) {
     let box = document.getElementById('booking-gpay-scanner-box');
     if (!box) return;
@@ -310,7 +327,7 @@ async function toggleGPayScannerBox(show) {
     box.innerHTML = `
         <div class="text-center py-3 bg-light rounded-3">
             <span class="spinner-border spinner-border-sm text-warning"></span>
-            <span class="ms-2 small text-muted">Fetching official GPay scanner...</span>
+            <span class="ms-2 small text-muted">Fetching official QR scanner...</span>
         </div>
     `;
 
@@ -322,30 +339,30 @@ async function toggleGPayScannerBox(show) {
             box.innerHTML = `
                 <div class="border rounded-4 p-3 bg-white shadow-sm border-warning">
                     <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
-                        <span class="fw-bold text-dark"><i class="bi bi-google text-primary me-2"></i>Official JhazTaxi GPay Scanner</span>
+                        <span class="fw-bold text-dark"><i class="bi bi-qr-code-scan text-primary me-2"></i>Official Jhaz 1 Way Taxi QR Scanner (GPay / PhonePe / Paytm)</span>
                         <span class="badge bg-success-subtle text-success border border-success">Verified Business QR</span>
                     </div>
                     <div class="row align-items-center g-3">
                         <div class="col-sm-5 text-center">
-                            <img src="${s.qr_image_url || '/assets/icons/favicon.svg'}" alt="Official GPay Scanner" class="img-fluid rounded-3 shadow-sm border p-1" style="max-height: 180px;">
+                            <img src="${s.qr_image_url || '/assets/icons/favicon.svg'}" alt="Official QR Scanner" class="img-fluid rounded-3 shadow-sm border p-1" style="max-height: 180px;">
                             <div class="small text-muted mt-1"><i class="bi bi-shield-check text-success"></i> Scan to Pay ₹${currentBookingState.estimatedFare || 'Fare'}</div>
                         </div>
                         <div class="col-sm-7">
                             <div class="mb-2">
                                 <small class="text-muted d-block">Payee Name:</small>
-                                <span class="fw-bold text-dark">${s.payee_name || 'JhazTaxi Travels'}</span>
+                                <span class="fw-bold text-dark">${s.payee_name || 'Jhaz 1 Way Taxi'}</span>
                             </div>
                             <div class="mb-2">
                                 <small class="text-muted d-block">UPI ID / VPA:</small>
                                 <div class="d-flex align-items-center gap-2">
-                                    <code class="fw-bold fs-6 text-primary">${s.upi_id || 'jhaztaxi@upi'}</code>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="navigator.clipboard.writeText('${s.upi_id}'); showToast('UPI ID copied!', 'info')">
+                                    <code class="fw-bold fs-6 text-primary">${s.upi_id || '9043519772@upi'}</code>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="navigator.clipboard.writeText('${s.upi_id || '9043519772@upi'}'); showToast('UPI ID copied!', 'info')">
                                         <i class="bi bi-clipboard"></i> Copy
                                     </button>
                                 </div>
                             </div>
                             <div class="alert alert-light border small text-muted mb-0 py-2">
-                                <i class="bi bi-info-circle me-1"></i> ${s.instructions || 'You can scan and pay now or pay the driver directly upon arrival.'}
+                                <i class="bi bi-info-circle me-1"></i> ${s.instructions || 'Scan with Google Pay, PhonePe, Paytm, or any UPI app. You can also pay the driver directly upon arrival.'}
                             </div>
                         </div>
                     </div>
@@ -358,16 +375,23 @@ async function toggleGPayScannerBox(show) {
 }
 
 
-// Submit Booking Order to Backend
+// Submit Booking Order to Backend (Open to all customers - No login required)
 async function submitBookingOrder() {
-    const token = getAuthToken();
-    if (!token) {
-        showToast('Please login to complete your taxi booking.', 'warning');
-        // Save state to sessionStorage to resume after login
-        sessionStorage.setItem('pending_booking_state', JSON.stringify(currentBookingState));
-        setTimeout(() => {
-            window.location.href = `/login.html?next=${encodeURIComponent(window.location.pathname + window.location.search)}`;
-        }, 1200);
+    const nameInput = document.getElementById('customer-name');
+    const phoneInput = document.getElementById('customer-phone');
+    const customerName = nameInput ? nameInput.value.trim() : '';
+    const customerPhone = phoneInput ? phoneInput.value.trim() : '';
+
+    if (!customerName) {
+        showToast('Please enter your Name before booking.', 'warning');
+        if (nameInput) nameInput.focus();
+        return;
+    }
+
+    const cleanPhone = customerPhone.replace(/\D/g, '');
+    if (!customerPhone || cleanPhone.length < 10) {
+        showToast('Please enter a valid 10-digit mobile number.', 'warning');
+        if (phoneInput) phoneInput.focus();
         return;
     }
 
@@ -383,7 +407,7 @@ async function submitBookingOrder() {
 
     const btn = document.getElementById('btn-confirm-booking');
     if (btn) {
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Confirming Ride with JhazTaxi...';
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Confirming Ride with Jhaz 1 Way Taxi...';
         btn.disabled = true;
     }
 
@@ -393,6 +417,8 @@ async function submitBookingOrder() {
     const notesInput = document.getElementById('customer-notes');
 
     const payload = {
+        customer_name: customerName,
+        customer_phone: customerPhone,
         vehicle_id: currentBookingState.selectedVehicleId,
         pickup_address: currentBookingState.pickupAddress,
         pickup_lat: currentBookingState.pickupLat,
@@ -415,11 +441,20 @@ async function submitBookingOrder() {
     });
 
     if (res.ok && res.data.success) {
-        showToast(res.data.message || 'Ride booked successfully!', 'success');
-        const bookingId = res.data.booking.booking_id;
-        setTimeout(() => {
-            window.location.href = `/user/booking-details.html?id=${bookingId}`;
-        }, 1000);
+        const booking = res.data.booking;
+        const whatsappUrl = res.data.whatsapp_url || generateWhatsAppBookingLink(booking, customerName, customerPhone);
+
+        showToast('Booking placed successfully! Dispatch notified.', 'success');
+
+        // Show comprehensive confirmation modal with tagline and direct WhatsApp button
+        showBookingSuccessModal(booking, customerName, customerPhone, whatsappUrl);
+
+        if (btn) {
+            btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i> Booking Placed Successfully!';
+            btn.classList.remove('btn-yellow');
+            btn.classList.add('btn-success');
+            btn.disabled = false;
+        }
     } else {
         if (btn) {
             btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i> Confirm Booking Now';
@@ -427,6 +462,111 @@ async function submitBookingOrder() {
         }
         showToast(res.data.message || 'Unable to place booking. Please check details.', 'error');
     }
+}
+
+function generateWhatsAppBookingLink(booking, customerName, customerPhone) {
+    const vType = booking.vehicle_details?.vehicle_type || 'Taxi';
+    const vName = booking.vehicle_details?.name || '';
+    const text = 
+        `🚕 *NEW BOOKING - JHAZ 1 WAY TAXI*\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `🆔 *Booking ID:* ${booking.booking_id}\n` +
+        `👤 *Customer Name:* ${customerName}\n` +
+        `📞 *Mobile Number:* ${customerPhone}\n` +
+        `📍 *Pickup Location:* ${booking.pickup_address}\n` +
+        `🏁 *Drop Destination:* ${booking.drop_address}\n` +
+        `📅 *Date & Time:* ${booking.pickup_date} at ${booking.pickup_time}\n` +
+        `🚗 *Vehicle Type:* ${vType} (${vName})\n` +
+        `👥 *Passengers:* ${booking.passengers}\n` +
+        `🛣️ *Distance:* ${booking.distance_km} KM\n` +
+        `💰 *Total Fare:* ₹${booking.total_fare}\n` +
+        `💳 *Payment Mode:* ${(booking.payment_method || 'CASH').toUpperCase()}\n` +
+        (booking.customer_notes ? `📝 *Special Notes:* ${booking.customer_notes}\n` : '') +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `🚖 *Jhaz 1 Way Taxi*\n` +
+        `Dispatch & WhatsApp: 9043519772`;
+
+    return `https://api.whatsapp.com/send?phone=919043519772&text=${encodeURIComponent(text)}`;
+}
+
+function showBookingSuccessModal(booking, customerName, customerPhone, whatsappUrl) {
+    let modalEl = document.getElementById('bookingSuccessModal');
+    if (!modalEl) {
+        modalEl = document.createElement('div');
+        modalEl.className = 'modal fade';
+        modalEl.id = 'bookingSuccessModal';
+        modalEl.tabIndex = -1;
+        modalEl.setAttribute('aria-hidden', 'true');
+        modalEl.setAttribute('data-bs-backdrop', 'static');
+        document.body.appendChild(modalEl);
+    }
+
+    modalEl.innerHTML = `
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
+                <div class="bg-success p-4 text-center text-white position-relative">
+                    <div class="rounded-circle bg-white text-success d-inline-flex align-items-center justify-content-center shadow mb-3" style="width: 70px; height: 70px;">
+                        <i class="bi bi-check-lg display-5 fw-bold"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">Booking Confirmed!</h3>
+                    <p class="mb-0 text-white-50">Booking Reference: <strong class="text-white text-uppercase tracking-wider">${booking.booking_id}</strong></p>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Prominent Success Tagline requested by user -->
+                    <div class="alert alert-success border-0 rounded-3 py-3 px-3 fw-bold text-center mb-3 shadow-sm" style="font-size: 1.05rem;">
+                        <i class="bi bi-headset me-2 fs-5 text-success"></i> Successfully Booked! Our team will contact you shortly.
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 mb-3 border">
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                            <span class="text-muted small">Customer Name:</span>
+                            <span class="fw-bold text-dark">${customerName}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                            <span class="text-muted small">Mobile Number:</span>
+                            <span class="fw-bold text-dark">${customerPhone}</span>
+                        </div>
+                        <div class="mb-2 pb-2 border-bottom">
+                            <span class="text-muted small d-block">Pickup Location:</span>
+                            <strong class="text-success"><i class="bi bi-geo-alt-fill me-1"></i>${booking.pickup_address}</strong>
+                        </div>
+                        <div class="mb-2 pb-2 border-bottom">
+                            <span class="text-muted small d-block">Drop Location:</span>
+                            <strong class="text-danger"><i class="bi bi-flag-fill me-1"></i>${booking.drop_address}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                            <span class="text-muted small">Pickup Schedule:</span>
+                            <span class="fw-bold text-dark">${booking.pickup_date} at ${booking.pickup_time}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                            <span class="text-muted small">Vehicle:</span>
+                            <span class="badge bg-warning text-dark">${booking.vehicle_details?.vehicle_type || 'Taxi'} (${booking.vehicle_details?.name || ''})</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center pt-1">
+                            <span class="fw-bold text-dark">Estimated Fare:</span>
+                            <span class="fs-4 fw-bold text-success">₹${booking.total_fare}</span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <!-- Direct WhatsApp button -->
+                        <a href="${whatsappUrl}" target="_blank" class="btn btn-success btn-lg fw-bold py-3 shadow d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-whatsapp fs-4"></i> Chat on WhatsApp (Direct Confirmation)
+                        </a>
+                        <a href="tel:9043519772" class="btn btn-yellow fw-bold py-2 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-telephone-fill me-1"></i> Call Dispatch: 9043519772
+                        </a>
+                        <button type="button" class="btn btn-outline-secondary mt-1" data-bs-dismiss="modal" onclick="window.location.reload()">
+                            Done • Book Another Ride
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const bsModal = new bootstrap.Modal(modalEl);
+    bsModal.show();
 }
 
 // Location autocomplete setup
