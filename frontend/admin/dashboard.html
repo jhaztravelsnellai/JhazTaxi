@@ -23,7 +23,6 @@
             <nav class="admin-nav">
                 <a href="/admin/dashboard.html" class="admin-nav-item active"><i class="bi bi-speedometer2"></i> Dashboard</a>
                 <a href="/admin/bookings.html" class="admin-nav-item"><i class="bi bi-journal-text"></i> Customer Bookings</a>
-                <a href="/admin/vehicles.html" class="admin-nav-item"><i class="bi bi-car-front"></i> Vehicles Fleet</a>
                 <a href="/admin/fares.html" class="admin-nav-item"><i class="bi bi-qr-code-scan"></i> Fare & QR Settings</a>
                 <a href="/admin/payments.html" class="admin-nav-item"><i class="bi bi-credit-card"></i> Payments</a>
                 <hr class="border-secondary my-3">
@@ -153,31 +152,22 @@
 
                 <!-- Quick Action Banners -->
                 <div class="row g-3">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="card p-3 border-0 shadow-sm d-flex flex-row align-items-center justify-content-between">
                             <div>
                                 <h6 class="fw-bold mb-1">Customer Bookings</h6>
-                                <p class="text-muted small mb-0">View all customer rides and WhatsApp dispatch.</p>
+                                <p class="text-muted small mb-0">View all customer rides and 1-click WhatsApp dispatch.</p>
                             </div>
-                            <a href="/admin/bookings.html" class="btn btn-sm btn-yellow"><i class="bi bi-journal-text"></i> View</a>
+                            <a href="/admin/bookings.html" class="btn btn-sm btn-yellow"><i class="bi bi-journal-text"></i> View Bookings</a>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="card p-3 border-0 shadow-sm d-flex flex-row align-items-center justify-content-between">
                             <div>
                                 <h6 class="fw-bold mb-1">Fare & QR Settings</h6>
-                                <p class="text-muted small mb-0">Update Base Fare, KM rates and UPI scanner.</p>
+                                <p class="text-muted small mb-0">Update Sedan & SUV KM rates and UPI payment scanner.</p>
                             </div>
-                            <a href="/admin/fares.html" class="btn btn-sm btn-outline-dark"><i class="bi bi-qr-code-scan"></i> Manage</a>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card p-3 border-0 shadow-sm d-flex flex-row align-items-center justify-content-between">
-                            <div>
-                                <h6 class="fw-bold mb-1">Vehicles Fleet</h6>
-                                <p class="text-muted small mb-0">Manage vehicle categories and pricing.</p>
-                            </div>
-                            <a href="/admin/vehicles.html" class="btn btn-sm btn-dark"><i class="bi bi-car-front-fill"></i> Fleet</a>
+                            <a href="/admin/fares.html" class="btn btn-sm btn-outline-dark"><i class="bi bi-qr-code-scan"></i> Manage Rates</a>
                         </div>
                     </div>
                 </div>
@@ -235,10 +225,8 @@
                             <div class="col-sm-4">
                                 <label class="form-label small fw-bold text-uppercase">Vehicle Type</label>
                                 <select name="vehicle_type" class="form-select" required>
-                                    <option value="Mini">Mini (Hatchback)</option>
-                                    <option value="Sedan" selected>Sedan</option>
-                                    <option value="SUV">SUV (Innova / Ertiga)</option>
-                                    <option value="Premium">Premium (Innova Crysta)</option>
+                                    <option value="Sedan" selected>Sedan (4 Seater)</option>
+                                    <option value="SUV">SUV (Innova / 6 Seater)</option>
                                 </select>
                             </div>
                             <div class="col-sm-4">

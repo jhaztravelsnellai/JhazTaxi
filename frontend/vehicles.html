@@ -33,50 +33,28 @@
     {
       "@context": "https://schema.org",
       "@type": "ItemList",
-      "name": "JhazTaxi Fleet Categories",
+      "name": "Jhaz 1 Way Taxi Fleet Categories",
       "description": "Available taxi vehicle categories and transparent pricing",
       "itemListElement": [
         {
           "@type": "Product",
           "position": 1,
-          "name": "Mini (Hatchback)",
-          "description": "Economical city commuting for up to 4 passengers with AC",
+          "name": "Sedan (Dzire / Etios)",
+          "description": "Comfortable family & business travel with spacious trunk and 4 passenger capacity",
           "offers": {
             "@type": "Offer",
-            "price": "12.00",
+            "price": "14.00",
             "priceCurrency": "INR"
           }
         },
         {
           "@type": "Product",
           "position": 2,
-          "name": "Sedan (Dzire / Etios)",
-          "description": "Comfortable family & business travel with spacious trunk and 4 passenger capacity",
-          "offers": {
-            "@type": "Offer",
-            "price": "15.00",
-            "priceCurrency": "INR"
-          }
-        },
-        {
-          "@type": "Product",
-          "position": 3,
           "name": "SUV (Innova / Ertiga)",
           "description": "Spacious travel for up to 6 passengers, perfect for outstation & airport transfers",
           "offers": {
             "@type": "Offer",
             "price": "20.00",
-            "priceCurrency": "INR"
-          }
-        },
-        {
-          "@type": "Product",
-          "position": 4,
-          "name": "Premium Luxury",
-          "description": "Executive high-end cars with top-tier comfort and VIP hospitality",
-          "offers": {
-            "@type": "Offer",
-            "price": "25.00",
             "priceCurrency": "INR"
           }
         }
@@ -154,10 +132,10 @@
             if (res.ok && res.data.vehicles) {
                 const vehicles = res.data.vehicles;
                 grid.innerHTML = vehicles.map(v => `
-                    <div class="col-md-6 col-lg-3">
-                        <div class="vehicle-card">
-                            <div class="vehicle-img-wrapper">
-                                <span class="vehicle-type-pill">${v.vehicle_type}</span>
+                    <div class="col-md-6">
+                        <div class="vehicle-card h-100 shadow-sm">
+                            <div class="vehicle-img-wrapper" style="height: 220px;">
+                                <span class="vehicle-type-pill fs-6 px-3 py-1">${v.vehicle_type}</span>
                                 <img src="${v.image_url || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80'}" alt="${v.name}">
                             </div>
                             <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between">

@@ -233,10 +233,8 @@
                                 <div class="col-sm-6">
                                     <label class="form-label small fw-bold text-uppercase">Vehicle Category</label>
                                     <select name="vehicle" class="form-select">
-                                        <option value="Sedan" selected>Sedan (₹15/KM)</option>
-                                        <option value="Mini">Mini (₹12/KM)</option>
+                                        <option value="Sedan" selected>Sedan (₹14/KM)</option>
                                         <option value="SUV">SUV (₹20/KM)</option>
-                                        <option value="Premium">Premium (₹25/KM)</option>
                                     </select>
                                 </div>
                                 <div class="col-sm-6">
@@ -306,78 +304,40 @@
                 <a href="/vehicles.html" class="btn btn-outline-dark fw-bold">Explore All Specs &rarr;</a>
             </div>
             <div class="row g-4">
-                <div class="col-md-6 col-lg-3">
-                    <div class="vehicle-card">
-                        <div class="vehicle-img-wrapper">
-                            <span class="vehicle-type-pill">Mini</span>
-                            <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80" alt="Mini Taxi">
+                <div class="col-md-6">
+                    <div class="vehicle-card h-100 shadow-sm border-0">
+                        <div class="vehicle-img-wrapper" style="height: 220px;">
+                            <span class="vehicle-type-pill fs-6 px-3 py-1">Sedan</span>
+                            <img src="https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=800&q=80" alt="Sedan Taxi">
                         </div>
-                        <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between">
+                        <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
                             <div>
-                                <h5 class="fw-bold mb-1">Maruti Swift / WagonR</h5>
-                                <div class="text-muted small mb-2"><i class="bi bi-people-fill me-1"></i> Up to 4 Passengers</div>
-                                <p class="text-muted small">Compact, AC economical ride for swift transit and budget travels.</p>
+                                <h4 class="fw-bold mb-1">Sedan (Dzire / Etios)</h4>
+                                <div class="text-muted mb-3"><i class="bi bi-people-fill me-1"></i> Up to 4 Passengers &bull; AC &bull; Large Boot Space</div>
+                                <p class="text-muted">Comfortable, air-conditioned sedan tailored for outstation one-way drops, airport runs, and business commutes.</p>
                             </div>
-                            <div class="border-top pt-2 d-flex justify-content-between align-items-center">
-                                <div><strong class="text-dark fs-5">₹12</strong><span class="text-muted small">/KM</span></div>
-                                <a href="/booking.html?vehicle=Mini" class="btn btn-sm btn-yellow fw-bold">Select</a>
+                            <div class="border-top pt-3 d-flex justify-content-between align-items-center">
+                                <div><strong class="text-dark fs-3">₹14</strong><span class="text-muted">/KM (Base: ₹100)</span></div>
+                                <a href="/booking.html?vehicle=Sedan" class="btn btn-yellow px-4 fw-bold">Select Sedan &rarr;</a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="vehicle-card">
-                        <div class="vehicle-img-wrapper">
-                            <span class="vehicle-type-pill">Sedan</span>
-                            <img src="https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=600&q=80" alt="Sedan Taxi">
+                <div class="col-md-6">
+                    <div class="vehicle-card h-100 shadow-sm border-0">
+                        <div class="vehicle-img-wrapper" style="height: 220px;">
+                            <span class="vehicle-type-pill fs-6 px-3 py-1">SUV</span>
+                            <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80" alt="SUV Taxi">
                         </div>
-                        <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between">
+                        <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
                             <div>
-                                <h5 class="fw-bold mb-1">Maruti Dzire / Etios</h5>
-                                <div class="text-muted small mb-2"><i class="bi bi-people-fill me-1"></i> Up to 4 Passengers</div>
-                                <p class="text-muted small">Spacious boot, smooth AC comfort, ideal for one-way drops & outstation journeys.</p>
+                                <h4 class="fw-bold mb-1">SUV (Innova / Ertiga)</h4>
+                                <div class="text-muted mb-3"><i class="bi bi-people-fill me-1"></i> Up to 6-7 Passengers &bull; Dual AC &bull; Extra Luggage Space</div>
+                                <p class="text-muted">Spacious multi-seater SUV perfect for family tours, temple visits, extra luggage, and long highway journeys.</p>
                             </div>
-                            <div class="border-top pt-2 d-flex justify-content-between align-items-center">
-                                <div><strong class="text-dark fs-5">₹14</strong><span class="text-muted small">/KM</span></div>
-                                <a href="/booking.html?vehicle=Sedan" class="btn btn-sm btn-yellow fw-bold">Select</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="vehicle-card">
-                        <div class="vehicle-img-wrapper">
-                            <span class="vehicle-type-pill">SUV</span>
-                            <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80" alt="SUV Taxi">
-                        </div>
-                        <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between">
-                            <div>
-                                <h5 class="fw-bold mb-1">Toyota Innova / Ertiga</h5>
-                                <div class="text-muted small mb-2"><i class="bi bi-people-fill me-1"></i> Up to 6 Passengers</div>
-                                <p class="text-muted small">Large family outings, heavy luggage, and airport transfer capacity.</p>
-                            </div>
-                            <div class="border-top pt-2 d-flex justify-content-between align-items-center">
-                                <div><strong class="text-dark fs-5">₹20</strong><span class="text-muted small">/KM</span></div>
-                                <a href="/booking.html?vehicle=SUV" class="btn btn-sm btn-yellow fw-bold">Select</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="vehicle-card">
-                        <div class="vehicle-img-wrapper">
-                            <span class="vehicle-type-pill">Premium</span>
-                            <img src="https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=600&q=80" alt="Premium Taxi">
-                        </div>
-                        <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between">
-                            <div>
-                                <h5 class="fw-bold mb-1">Innova Crysta Luxury</h5>
-                                <div class="text-muted small mb-2"><i class="bi bi-people-fill me-1"></i> Up to 7 Passengers</div>
-                                <p class="text-muted small">Executive captain seats, dual AC, plush ride quality for long highway trips.</p>
-                            </div>
-                            <div class="border-top pt-2 d-flex justify-content-between align-items-center">
-                                <div><strong class="text-dark fs-5">₹24</strong><span class="text-muted small">/KM</span></div>
-                                <a href="/booking.html?vehicle=Premium" class="btn btn-sm btn-yellow fw-bold">Select</a>
+                            <div class="border-top pt-3 d-flex justify-content-between align-items-center">
+                                <div><strong class="text-dark fs-3">₹20</strong><span class="text-muted">/KM (Base: ₹150)</span></div>
+                                <a href="/booking.html?vehicle=SUV" class="btn btn-yellow px-4 fw-bold">Select SUV &rarr;</a>
                             </div>
                         </div>
                     </div>

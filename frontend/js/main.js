@@ -65,7 +65,6 @@ function updateNavbarAuthState() {
             dashboardLink = '/admin/dashboard.html';
             roleLinks = `
                 <li><a class="dropdown-item" href="/admin/bookings.html"><i class="bi bi-journal-text me-2"></i>Customer Bookings</a></li>
-                <li><a class="dropdown-item" href="/admin/vehicles.html"><i class="bi bi-car-front me-2"></i>Vehicles Fleet</a></li>
                 <li><a class="dropdown-item" href="/admin/fares.html"><i class="bi bi-tag me-2"></i>Fares & QR</a></li>
                 <li><a class="dropdown-item" href="/admin/payments.html"><i class="bi bi-credit-card me-2"></i>Payments</a></li>
             `;

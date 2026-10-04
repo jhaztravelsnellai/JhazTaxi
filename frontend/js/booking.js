@@ -112,11 +112,11 @@ function checkUrlBookingParams() {
     }
 
     if (vType) {
-        currentBookingState.selectedVehicleType = vType;
+        currentBookingState.selectedVehicleType = vType.toLowerCase() === 'suv' ? 'SUV' : 'Sedan';
     }
 }
 
-// Load vehicles dynamically from backend
+// Load vehicles dynamically from backend (Strictly Sedan & SUV)
 async function loadVehicles() {
     const container = document.getElementById('vehicles-selection-list');
     if (!container) return;
@@ -125,7 +125,10 @@ async function loadVehicles() {
 
     const res = await fetchWithAuth(`${CONFIG.API_BASE_URL}/vehicles/`);
     if (res.ok && res.data.vehicles) {
-        availableVehicles = res.data.vehicles.filter(v => v.status === 'available');
+        // Strictly allow only Sedan and SUV
+        availableVehicles = res.data.vehicles.filter(v => 
+            v.status === 'available' && ['sedan', 'suv'].includes((v.vehicle_type || '').toLowerCase())
+        );
         renderVehicleCards(availableVehicles);
     } else {
         container.innerHTML = '<div class="alert alert-warning">Unable to load vehicles from server. Please ensure the backend is running.</div>';
@@ -149,20 +152,24 @@ function renderVehicleCards(vehicles) {
     let html = '';
     vehicles.forEach(v => {
         const isSelected = v.id === currentBookingState.selectedVehicleId;
-        const fallbackImg = 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=300&q=80';
+        const fallbackImg = v.vehicle_type === 'SUV' 
+            ? 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=300&q=80'
+            : 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=300&q=80';
         const imgUrl = v.image_url || fallbackImg;
+        const displayName = v.vehicle_type === 'SUV' ? 'SUV' : 'Sedan';
+        const carSubtitle = v.vehicle_type === 'SUV' ? 'Innova / Ertiga (6+1 Seats)' : 'Dzire / Etios (4+1 Seats)';
 
         html += `
             <div class="vehicle-select-item ${isSelected ? 'selected' : ''}" id="v-card-${v.id}" onclick="selectVehicle(${v.id}, '${v.vehicle_type}')">
                 <div class="d-flex align-items-center gap-3">
-                    <img src="${imgUrl}" alt="${v.name}" class="vehicle-thumb" onerror="this.src='${fallbackImg}'">
+                    <img src="${imgUrl}" alt="${displayName}" class="vehicle-thumb" onerror="this.src='${fallbackImg}'">
                     <div>
-                        <h6 class="mb-0 fw-bold">${v.name}</h6>
-                        <small class="text-muted"><i class="bi bi-people-fill me-1"></i>${v.capacity} Seats &bull; <span class="badge bg-light text-dark">${v.vehicle_type}</span></small>
+                        <h6 class="mb-0 fw-bold fs-6">${displayName}</h6>
+                        <small class="text-muted"><i class="bi bi-people-fill me-1"></i>${carSubtitle}</small>
                     </div>
                 </div>
                 <div class="text-end">
-                    <div class="fw-bold text-dark">₹${parseFloat(v.price_per_km).toFixed(0)}<small class="text-muted">/KM</small></div>
+                    <div class="fw-bold text-dark fs-5">₹${parseFloat(v.price_per_km).toFixed(0)}<small class="text-muted fs-6">/KM</small></div>
                     <small class="text-muted">Base: ₹${parseFloat(v.base_fare).toFixed(0)}</small>
                 </div>
             </div>

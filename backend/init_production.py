@@ -43,17 +43,6 @@ def init_production():
     if Vehicle.objects.count() == 0:
         fleet = [
             {
-                'name': 'Maruti Swift / WagonR (AC Mini)',
-                'vehicle_type': 'Mini',
-                'vehicle_number': 'TN-72-BK-6104',
-                'model': '2024',
-                'capacity': 4,
-                'base_fare': Decimal('80.00'),
-                'price_per_km': Decimal('12.00'),
-                'image_url': 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80',
-                'description': 'Economical AC hatchback for brisk city transit and budget one-way travels.'
-            },
-            {
                 'name': 'Maruti Dzire / Toyota Etios (AC Sedan)',
                 'vehicle_type': 'Sedan',
                 'vehicle_number': 'TN-72-AX-4521',
@@ -74,17 +63,6 @@ def init_production():
                 'price_per_km': Decimal('20.00'),
                 'image_url': 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80',
                 'description': 'Spacious 6-seater AC SUV with expansive boot space for family airport transfers and long outstation journeys.'
-            },
-            {
-                'name': 'Toyota Innova Crysta (Luxury 7+1 AC)',
-                'vehicle_type': 'Premium',
-                'vehicle_number': 'TN-72-CY-3390',
-                'model': '2025',
-                'capacity': 7,
-                'base_fare': Decimal('200.00'),
-                'price_per_km': Decimal('24.00'),
-                'image_url': 'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=600&q=80',
-                'description': 'Executive luxury travel with plush captain seats, rear AC vents, and high-speed highway comfort.'
             }
         ]
 
@@ -113,7 +91,7 @@ def init_production():
                     'is_active': True
                 }
             )
-        print(" [OK] Initialized 4 pristine production vehicle categories (Mini, Sedan, SUV, Premium) with fare rules.")
+        print(" [OK] Initialized 2 production vehicle categories (Sedan, SUV) with fare rules.")
     else:
         print(f" [INFO] Vehicle catalog already initialized ({Vehicle.objects.count()} vehicles). Skipping.")
 
