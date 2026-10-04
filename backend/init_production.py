@@ -39,61 +39,79 @@ def init_production():
     admin_user.save()
     print(f" [OK] Production Admin Account configured: {admin_email}")
 
-    # 2. Vehicle Catalog & Fare Settings Setup (if empty)
-    if Vehicle.objects.count() == 0:
-        fleet = [
-            {
-                'name': 'Maruti Dzire / Toyota Etios (AC Sedan)',
-                'vehicle_type': 'Sedan',
-                'vehicle_number': 'TN-72-AX-4521',
-                'model': '2024',
-                'capacity': 4,
-                'base_fare': Decimal('100.00'),
-                'price_per_km': Decimal('14.00'),
-                'image_url': 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=600&q=80',
-                'description': 'Comfortable air-conditioned sedan, perfect for outstation one-way drops, business, and family commutes.'
-            },
-            {
-                'name': 'Toyota Innova / Ertiga (AC SUV)',
-                'vehicle_type': 'SUV',
-                'vehicle_number': 'TN-72-BZ-8812',
-                'model': '2024',
-                'capacity': 6,
-                'base_fare': Decimal('150.00'),
-                'price_per_km': Decimal('20.00'),
-                'image_url': 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80',
-                'description': 'Spacious 6-seater AC SUV with expansive boot space for family airport transfers and long outstation journeys.'
-            }
-        ]
+    # 2. Vehicle Catalog & Fare Settings Setup (Sedan, SUV, Innova Crysta)
+    fleet = [
+        {
+            'name': 'Maruti Dzire / Toyota Etios (AC Sedan)',
+            'vehicle_type': 'Sedan',
+            'vehicle_number': 'TN-72-AX-4521',
+            'model': '2024',
+            'capacity': 4,
+            'base_fare': Decimal('100.00'),
+            'price_per_km': Decimal('14.00'),
+            'min_km': Decimal('130.00'),
+            'driver_bata': Decimal('400.00'),
+            'image_url': 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=600&q=80',
+            'description': 'Comfortable air-conditioned sedan, perfect for outstation one-way drops, business, and family commutes.'
+        },
+        {
+            'name': 'Toyota Innova / Ertiga (AC SUV)',
+            'vehicle_type': 'SUV',
+            'vehicle_number': 'TN-72-BZ-8812',
+            'model': '2024',
+            'capacity': 6,
+            'base_fare': Decimal('150.00'),
+            'price_per_km': Decimal('20.00'),
+            'min_km': Decimal('130.00'),
+            'driver_bata': Decimal('400.00'),
+            'image_url': 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80',
+            'description': 'Spacious 6-seater AC SUV with expansive boot space for family airport transfers and long outstation journeys.'
+        },
+        {
+            'name': 'Toyota Innova Crysta (Luxury 7+1 AC)',
+            'vehicle_type': 'Innova Crysta',
+            'vehicle_number': 'TN-72-CR-9901',
+            'model': '2024',
+            'capacity': 7,
+            'base_fare': Decimal('200.00'),
+            'price_per_km': Decimal('24.00'),
+            'min_km': Decimal('130.00'),
+            'driver_bata': Decimal('400.00'),
+            'image_url': 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80',
+            'description': 'Premium 7-seater luxury Innova Crysta with captain seats, dual AC, and maximum comfort for premium long-distance travel.'
+        }
+    ]
 
-        for item in fleet:
-            Vehicle.objects.create(
-                name=item['name'],
-                vehicle_type=item['vehicle_type'],
-                vehicle_number=item['vehicle_number'],
-                model=item['model'],
-                capacity=item['capacity'],
-                base_fare=item['base_fare'],
-                price_per_km=item['price_per_km'],
-                image_url=item['image_url'],
-                description=item['description'],
-                status='available'
-            )
-            FareSetting.objects.update_or_create(
-                vehicle_type=item['vehicle_type'],
-                defaults={
-                    'base_fare': item['base_fare'],
-                    'price_per_km': item['price_per_km'],
-                    'min_fare': item['base_fare'],
-                    'waiting_charge_per_min': Decimal('2.00'),
-                    'night_charge_percent': Decimal('20.00'),
-                    'additional_passenger_charge': Decimal('30.00'),
-                    'is_active': True
-                }
-            )
-        print(" [OK] Initialized 2 production vehicle categories (Sedan, SUV) with fare rules.")
-    else:
-        print(f" [INFO] Vehicle catalog already initialized ({Vehicle.objects.count()} vehicles). Skipping.")
+    for item in fleet:
+        v, v_created = Vehicle.objects.update_or_create(
+            vehicle_type=item['vehicle_type'],
+            defaults={
+                'name': item['name'],
+                'vehicle_number': item['vehicle_number'],
+                'model': item['model'],
+                'capacity': item['capacity'],
+                'base_fare': item['base_fare'],
+                'price_per_km': item['price_per_km'],
+                'image_url': item['image_url'],
+                'description': item['description'],
+                'status': 'available'
+            }
+        )
+        FareSetting.objects.update_or_create(
+            vehicle_type=item['vehicle_type'],
+            defaults={
+                'base_fare': item['base_fare'],
+                'price_per_km': item['price_per_km'],
+                'min_km': item['min_km'],
+                'driver_bata': item['driver_bata'],
+                'min_fare': item['base_fare'],
+                'waiting_charge_per_min': Decimal('2.00'),
+                'night_charge_percent': Decimal('20.00'),
+                'additional_passenger_charge': Decimal('30.00'),
+                'is_active': True
+            }
+        )
+    print(" [OK] Initialized 3 production vehicle categories (Sedan, SUV, Innova Crysta) with Min 130KM & Driver Bata Rs. 400.")
 
     # 3. Ensure Default PaymentSetting exists for Admin GPay Scanner
     from payments.models import PaymentSetting

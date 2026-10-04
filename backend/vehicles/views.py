@@ -82,6 +82,11 @@ def fare_setting_update_view(request, vehicle_type):
     serializer = FareSettingSerializer(fare, data=request.data, partial=True)
     if serializer.is_valid():
         updated = serializer.save()
+        # Keep Vehicle price_per_km and base_fare in sync
+        Vehicle.objects.filter(vehicle_type__iexact=vehicle_type).update(
+            price_per_km=updated.price_per_km,
+            base_fare=updated.base_fare
+        )
         return Response({'success': True, 'message': f'Fare settings for {vehicle_type} updated', 'fare': FareSettingSerializer(updated).data})
     return Response({'success': False, 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -90,9 +95,12 @@ def fare_setting_update_view(request, vehicle_type):
 @permission_classes([permissions.AllowAny])
 def fare_estimate_view(request):
     """
-    Dynamic fare calculation endpoint.
-    Calculates exact fare based on DB FareSetting:
-    Formula: Total Fare = Base Fare + (Distance * Price/KM) + Waiting Charge + Night Charge + Extra Passenger Charge
+    Dynamic fare calculation endpoint for Jhaz 1 Way Taxi:
+    - Minimum Base Distance: 130 KM (if distance < 130 KM, billed for 130 KM)
+    - Distance Fare = Billable KM * Price Per KM
+    - Driver Bata: Rs. 400.00
+    - Total Base Fare = Distance Fare + Driver Bata (+ Night / Extra Passenger if applicable)
+    - Extra Charges shown to customer: Toll, Parking, State Tax at actuals
     """
     distance_km = request.data.get('distance_km')
     vehicle_type = request.data.get('vehicle_type', 'Sedan')
@@ -113,7 +121,6 @@ def fare_estimate_view(request):
                 dlon = lon2 - lon1
                 a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
                 c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-                # road distance is typically ~1.25x straight line
                 calc_dist = round(c * 6371.0 * 1.25, 2)
                 distance_km = max(calc_dist, 1.0)
             except Exception:
@@ -129,65 +136,82 @@ def fare_estimate_view(request):
     # Fetch fare setting from DB
     fare_setting = FareSetting.objects.filter(vehicle_type__iexact=vehicle_type, is_active=True).first()
     if not fare_setting:
-        # Fallback defaults if not seeded yet
         defaults = {
-            'Mini': (Decimal('80.00'), Decimal('12.00')),
-            'Sedan': (Decimal('100.00'), Decimal('15.00')),
-            'SUV': (Decimal('120.00'), Decimal('20.00')),
-            'Premium': (Decimal('150.00'), Decimal('25.00')),
+            'Sedan': (Decimal('100.00'), Decimal('14.00'), Decimal('130.00'), Decimal('400.00')),
+            'SUV': (Decimal('150.00'), Decimal('20.00'), Decimal('130.00'), Decimal('400.00')),
+            'Innova Crysta': (Decimal('200.00'), Decimal('24.00'), Decimal('130.00'), Decimal('400.00')),
         }
-        b_fare, p_km = defaults.get(vehicle_type, (Decimal('100.00'), Decimal('15.00')))
+        b_fare, p_km, m_km, d_bata = defaults.get(vehicle_type, (Decimal('100.00'), Decimal('14.00'), Decimal('130.00'), Decimal('400.00')))
         base_fare = b_fare
         price_per_km = p_km
-        min_fare = Decimal('80.00')
+        min_km = m_km
+        driver_bata = d_bata
         waiting_charge = Decimal('0.00')
         night_percent = Decimal('15.00')
         extra_pass_charge = Decimal('20.00')
     else:
         base_fare = fare_setting.base_fare
         price_per_km = fare_setting.price_per_km
-        min_fare = fare_setting.min_fare
-        waiting_charge = Decimal('0.00') # default initial waiting
+        min_km = getattr(fare_setting, 'min_km', Decimal('130.00')) or Decimal('130.00')
+        driver_bata = getattr(fare_setting, 'driver_bata', Decimal('400.00')) or Decimal('400.00')
+        waiting_charge = Decimal('0.00')
         night_percent = fare_setting.night_charge_percent
         extra_pass_charge = fare_setting.additional_passenger_charge
 
-    distance_fare = dist * price_per_km
+    # 130 KM Minimum Base Distance Rule
+    min_km_applied = dist < min_km
+    billable_km = max(dist, min_km)
+    distance_fare = billable_km * price_per_km
 
     # Night charge calculation (10 PM to 6 AM)
     night_charge = Decimal('0.00')
     is_night_ride = False
     if pickup_time:
         try:
-            pt = datetime.strptime(pickup_time, '%H:%M').time()
+            pt = datetime.strptime(pickup_time[:5], '%H:%M').time()
             if pt.hour >= 22 or pt.hour < 6:
                 is_night_ride = True
-                night_charge = (base_fare + distance_fare) * (night_percent / Decimal('100.00'))
+                night_charge = (distance_fare + driver_bata) * (night_percent / Decimal('100.00'))
         except Exception:
             pass
 
-    # Additional passenger charge if > standard capacity (4 for mini/sedan/premium, 6 for suv)
-    std_cap = 6 if vehicle_type.lower() == 'suv' else 4
+    # Extra passenger charge if > standard capacity (7 for Innova Crysta, 6 for SUV, 4 for Sedan)
+    if 'crysta' in vehicle_type.lower():
+        std_cap = 7
+    elif 'suv' in vehicle_type.lower():
+        std_cap = 6
+    else:
+        std_cap = 4
+
     additional_passenger_charge = Decimal('0.00')
     if passengers > std_cap:
         additional_passenger_charge = Decimal(str(passengers - std_cap)) * extra_pass_charge
 
-    # Total Calculation
-    total_fare = base_fare + distance_fare + waiting_charge + night_charge + additional_passenger_charge
-    if total_fare < min_fare:
-        total_fare = min_fare
+    # Total Calculation: Distance Fare + Driver Bata (400) + Night / Extra Pass
+    total_fare = distance_fare + driver_bata + waiting_charge + night_charge + additional_passenger_charge
 
     return Response({
         'success': True,
         'estimate': {
             'vehicle_type': vehicle_type,
             'distance_km': float(dist),
+            'min_km': float(min_km),
+            'billable_km': float(billable_km),
+            'min_km_applied': min_km_applied,
             'base_fare': float(base_fare),
             'price_per_km': float(price_per_km),
             'distance_fare': round(float(distance_fare), 2),
+            'driver_bata': float(driver_bata),
             'waiting_charge': round(float(waiting_charge), 2),
             'night_charge': round(float(night_charge), 2),
             'is_night_ride': is_night_ride,
             'additional_passenger_charge': round(float(additional_passenger_charge), 2),
             'total_fare': round(float(total_fare), 2),
+            'extra_charges': {
+                'toll': 'Fastag at actuals (as per trip route)',
+                'parking': 'At actuals (Airport / Railway station / Mall)',
+                'state_tax': 'Extra at actuals if crossing Tamil Nadu border',
+                'hill_charge': 'Applicable if travelling to hill stations'
+            }
         }
     })

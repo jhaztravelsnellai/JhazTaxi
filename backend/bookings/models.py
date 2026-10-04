@@ -66,8 +66,10 @@ class Booking(models.Model):
 
     # Fare Breakdown
     base_fare = models.DecimalField(max_digits=8, decimal_places=2, default=100.00)
-    price_per_km = models.DecimalField(max_digits=8, decimal_places=2, default=15.00)
+    price_per_km = models.DecimalField(max_digits=8, decimal_places=2, default=14.00)
+    billable_km = models.DecimalField(max_digits=8, decimal_places=2, default=130.00, help_text="Billed distance with 130 KM minimum")
     distance_fare = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
+    driver_bata = models.DecimalField(max_digits=8, decimal_places=2, default=400.00, help_text="Driver Bata charge")
     waiting_charge = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     night_charge = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     additional_passenger_charge = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)

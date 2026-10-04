@@ -235,6 +235,7 @@
                                     <select name="vehicle" class="form-select">
                                         <option value="Sedan" selected>Sedan (₹14/KM)</option>
                                         <option value="SUV">SUV (₹20/KM)</option>
+                                        <option value="Innova Crysta">Innova Crysta (₹24/KM)</option>
                                     </select>
                                 </div>
                                 <div class="col-sm-6">
@@ -246,6 +247,7 @@
                                         <option value="4">4 Passengers</option>
                                         <option value="5">5 Passengers (SUV)</option>
                                         <option value="6">6 Passengers (SUV)</option>
+                                        <option value="7">7 Passengers (Innova Crysta)</option>
                                     </select>
                                 </div>
                             </div>
@@ -279,7 +281,7 @@
                     <div class="jhaz-card h-100">
                         <div class="step-number-badge mx-auto">2</div>
                         <h4 class="fw-bold mb-3">Choose Your Ride</h4>
-                        <p class="text-muted">Select from Mini, Sedan, SUV, or Premium cabs with transparent, dynamic pricing. No surprise fees.</p>
+                        <p class="text-muted">Select from Sedan, SUV, or luxury Innova Crysta cabs with transparent, dynamic pricing. No surprise fees.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -300,44 +302,81 @@
                 <div>
                     <span class="text-warning fw-bold text-uppercase">Fleet Overview</span>
                     <h2 class="display-6 fw-bold mt-1">Our Vehicle Categories</h2>
+                    <p class="text-muted small mb-0">Standard Tamil Nadu 130 KM Minimum Base Distance &bull; Driver Bata ₹400 &bull; Toll/Parking Extra at actuals</p>
                 </div>
                 <a href="/vehicles.html" class="btn btn-outline-dark fw-bold">Explore All Specs &rarr;</a>
             </div>
             <div class="row g-4">
-                <div class="col-md-6">
+                <!-- Sedan -->
+                <div class="col-lg-4 col-md-6">
                     <div class="vehicle-card h-100 shadow-sm border-0">
-                        <div class="vehicle-img-wrapper" style="height: 220px;">
+                        <div class="vehicle-img-wrapper" style="height: 200px;">
                             <span class="vehicle-type-pill fs-6 px-3 py-1">Sedan</span>
                             <img src="https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=800&q=80" alt="Sedan Taxi">
                         </div>
                         <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
                             <div>
                                 <h4 class="fw-bold mb-1">Sedan (Dzire / Etios)</h4>
-                                <div class="text-muted mb-3"><i class="bi bi-people-fill me-1"></i> Up to 4 Passengers &bull; AC &bull; Large Boot Space</div>
-                                <p class="text-muted">Comfortable, air-conditioned sedan tailored for outstation one-way drops, airport runs, and business commutes.</p>
+                                <div class="text-muted mb-2"><i class="bi bi-people-fill me-1"></i> Up to 4 Passengers &bull; AC &bull; Large Boot</div>
+                                <p class="text-muted small">Comfortable, air-conditioned sedan tailored for outstation one-way drops, airport runs, and city commutes.</p>
+                                <div class="d-flex flex-wrap gap-1 mb-2">
+                                    <span class="badge bg-warning-subtle text-dark border border-warning" style="font-size: 0.72rem;">Min 130 KM Base</span>
+                                    <span class="badge bg-light text-dark border" style="font-size: 0.72rem;">Driver Bata ₹400</span>
+                                </div>
                             </div>
                             <div class="border-top pt-3 d-flex justify-content-between align-items-center">
-                                <div><strong class="text-dark fs-3">₹14</strong><span class="text-muted">/KM (Base: ₹100)</span></div>
-                                <a href="/booking.html?vehicle=Sedan" class="btn btn-yellow px-4 fw-bold">Select Sedan &rarr;</a>
+                                <div><strong class="text-dark fs-3">₹14</strong><span class="text-muted">/KM</span></div>
+                                <a href="/booking.html?vehicle=Sedan" class="btn btn-yellow px-3 fw-bold">Book Sedan &rarr;</a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+
+                <!-- SUV -->
+                <div class="col-lg-4 col-md-6">
                     <div class="vehicle-card h-100 shadow-sm border-0">
-                        <div class="vehicle-img-wrapper" style="height: 220px;">
+                        <div class="vehicle-img-wrapper" style="height: 200px;">
                             <span class="vehicle-type-pill fs-6 px-3 py-1">SUV</span>
                             <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80" alt="SUV Taxi">
                         </div>
                         <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
                             <div>
                                 <h4 class="fw-bold mb-1">SUV (Innova / Ertiga)</h4>
-                                <div class="text-muted mb-3"><i class="bi bi-people-fill me-1"></i> Up to 6-7 Passengers &bull; Dual AC &bull; Extra Luggage Space</div>
-                                <p class="text-muted">Spacious multi-seater SUV perfect for family tours, temple visits, extra luggage, and long highway journeys.</p>
+                                <div class="text-muted mb-2"><i class="bi bi-people-fill me-1"></i> Up to 6 Passengers &bull; Dual AC &bull; Spacious</div>
+                                <p class="text-muted small">Spacious multi-seater SUV perfect for family tours, temple visits, extra luggage, and long highway journeys.</p>
+                                <div class="d-flex flex-wrap gap-1 mb-2">
+                                    <span class="badge bg-warning-subtle text-dark border border-warning" style="font-size: 0.72rem;">Min 130 KM Base</span>
+                                    <span class="badge bg-light text-dark border" style="font-size: 0.72rem;">Driver Bata ₹400</span>
+                                </div>
                             </div>
                             <div class="border-top pt-3 d-flex justify-content-between align-items-center">
-                                <div><strong class="text-dark fs-3">₹20</strong><span class="text-muted">/KM (Base: ₹150)</span></div>
-                                <a href="/booking.html?vehicle=SUV" class="btn btn-yellow px-4 fw-bold">Select SUV &rarr;</a>
+                                <div><strong class="text-dark fs-3">₹20</strong><span class="text-muted">/KM</span></div>
+                                <a href="/booking.html?vehicle=SUV" class="btn btn-yellow px-3 fw-bold">Book SUV &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Innova Crysta -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="vehicle-card h-100 shadow-sm border-0">
+                        <div class="vehicle-img-wrapper" style="height: 200px;">
+                            <span class="vehicle-type-pill fs-6 px-3 py-1 bg-dark text-warning">Innova Crysta</span>
+                            <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80" alt="Innova Crysta Taxi">
+                        </div>
+                        <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
+                            <div>
+                                <h4 class="fw-bold mb-1">Innova Crysta (Luxury)</h4>
+                                <div class="text-muted mb-2"><i class="bi bi-people-fill me-1"></i> Up to 7 Passengers &bull; Captain Seats AC</div>
+                                <p class="text-muted small">Supreme executive luxury ride with premium push-back captain seats, superior legroom, and maximum comfort.</p>
+                                <div class="d-flex flex-wrap gap-1 mb-2">
+                                    <span class="badge bg-warning-subtle text-dark border border-warning" style="font-size: 0.72rem;">Min 130 KM Base</span>
+                                    <span class="badge bg-light text-dark border" style="font-size: 0.72rem;">Driver Bata ₹400</span>
+                                </div>
+                            </div>
+                            <div class="border-top pt-3 d-flex justify-content-between align-items-center">
+                                <div><strong class="text-dark fs-3">₹24</strong><span class="text-muted">/KM</span></div>
+                                <a href="/booking.html?vehicle=Innova%20Crysta" class="btn btn-yellow px-3 fw-bold">Book Crysta &rarr;</a>
                             </div>
                         </div>
                     </div>

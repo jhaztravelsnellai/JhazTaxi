@@ -141,36 +141,56 @@ def booking_list_create_view(request):
     if fare_setting:
         base_fare = fare_setting.base_fare
         price_per_km = fare_setting.price_per_km
+        min_km = getattr(fare_setting, 'min_km', Decimal('130.00')) or Decimal('130.00')
+        driver_bata = getattr(fare_setting, 'driver_bata', Decimal('400.00')) or Decimal('400.00')
         min_fare = fare_setting.min_fare
         waiting_charge = Decimal('0.00')
         night_percent = fare_setting.night_charge_percent
         extra_pass_charge = fare_setting.additional_passenger_charge
     else:
-        base_fare = vehicle.base_fare
-        price_per_km = vehicle.price_per_km
+        defaults = {
+            'Sedan': (Decimal('100.00'), Decimal('14.00'), Decimal('130.00'), Decimal('400.00')),
+            'SUV': (Decimal('150.00'), Decimal('20.00'), Decimal('130.00'), Decimal('400.00')),
+            'Innova Crysta': (Decimal('200.00'), Decimal('24.00'), Decimal('130.00'), Decimal('400.00')),
+        }
+        b_fare, p_km, m_km, d_bata = defaults.get(vehicle.vehicle_type, (Decimal('100.00'), Decimal('14.00'), Decimal('130.00'), Decimal('400.00')))
+        base_fare = b_fare
+        price_per_km = p_km
+        min_km = m_km
+        driver_bata = d_bata
         min_fare = Decimal('80.00')
         waiting_charge = Decimal('0.00')
         night_percent = Decimal('15.00')
         extra_pass_charge = Decimal('20.00')
 
-    distance_fare = distance_km * price_per_km
+    # 130 KM Minimum Base Distance Rule
+    min_km_applied = distance_km < min_km
+    billable_km = max(distance_km, min_km)
+    distance_fare = billable_km * price_per_km
 
     # Night surcharge if between 22:00 and 06:00
     night_charge = Decimal('0.00')
     try:
         pt = datetime.strptime(pickup_time[:5], '%H:%M').time()
         if pt.hour >= 22 or pt.hour < 6:
-            night_charge = (base_fare + distance_fare) * (night_percent / Decimal('100.00'))
+            night_charge = (distance_fare + driver_bata) * (night_percent / Decimal('100.00'))
     except Exception:
         pass
 
     # Extra passenger surcharge
-    std_cap = 6 if vehicle.vehicle_type == 'SUV' else 4
+    if 'crysta' in vehicle.vehicle_type.lower():
+        std_cap = 7
+    elif 'suv' in vehicle.vehicle_type.lower():
+        std_cap = 6
+    else:
+        std_cap = 4
+
     additional_passenger_charge = Decimal('0.00')
     if passengers > std_cap:
         additional_passenger_charge = Decimal(str(passengers - std_cap)) * extra_pass_charge
 
-    total_fare = base_fare + distance_fare + waiting_charge + night_charge + additional_passenger_charge
+    # Total Calculation: Distance Fare (min 130 km) + Driver Bata (400) + Night / Extra Pass
+    total_fare = distance_fare + driver_bata + waiting_charge + night_charge + additional_passenger_charge
     if total_fare < min_fare:
         total_fare = min_fare
 
@@ -187,10 +207,12 @@ def booking_list_create_view(request):
         pickup_time=pickup_time,
         passengers=passengers,
         distance_km=distance_km,
+        billable_km=billable_km,
         duration_mins=duration_mins,
         base_fare=base_fare,
         price_per_km=price_per_km,
         distance_fare=distance_fare,
+        driver_bata=driver_bata,
         waiting_charge=waiting_charge,
         night_charge=night_charge,
         additional_passenger_charge=additional_passenger_charge,
@@ -233,6 +255,10 @@ def booking_list_create_view(request):
         )
 
     # Build WhatsApp URL for 9043519772
+    dist_note = f"{booking.distance_km} KM"
+    if min_km_applied:
+        dist_note += f" (Min {min_km} KM Base applied)"
+
     whatsapp_text = (
         f"🚕 *NEW BOOKING - JHAZ 1 WAY TAXI*\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
@@ -244,9 +270,19 @@ def booking_list_create_view(request):
         f"📅 *Date & Time:* {booking.pickup_date} at {booking.pickup_time}\n"
         f"🚗 *Vehicle Type:* {vehicle.vehicle_type} ({vehicle.name})\n"
         f"👥 *Passengers:* {booking.passengers}\n"
-        f"🛣️ *Distance:* {booking.distance_km} KM\n"
-        f"💰 *Total Fare:* ₹{booking.total_fare}\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"📊 *FARE BREAKDOWN:*\n"
+        f"🛣️ *Distance:* {dist_note}\n"
+        f"🏷️ *Rate:* ₹{booking.price_per_km}/KM\n"
+        f"💵 *Distance Fare:* ₹{booking.distance_fare}\n"
+        f"👨‍✈️ *Driver Bata:* ₹{booking.driver_bata}\n"
+        f"💰 *Total Estimated Fare:* ₹{booking.total_fare}\n"
         f"💳 *Payment Mode:* {booking.payment_method.upper()}\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"⚠️ *Extra Charges (Customer Notice):*\n"
+        f"• 🛣️ Toll Charges (Fastag) : At actuals\n"
+        f"• 🅿️ Parking Charges : At actuals\n"
+        f"• 🏛️ State Tax / Permit : At actuals (if interstate)\n"
     )
     if booking.customer_notes:
         whatsapp_text += f"📝 *Special Notes:* {booking.customer_notes}\n"

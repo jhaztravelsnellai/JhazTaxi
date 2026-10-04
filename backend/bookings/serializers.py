@@ -36,7 +36,7 @@ class BookingSerializer(serializers.ModelSerializer):
             'drop_address', 'drop_lat', 'drop_lng',
             'pickup_date', 'pickup_time', 'passengers',
             'distance_km', 'duration_mins',
-            'base_fare', 'price_per_km', 'distance_fare',
+            'base_fare', 'price_per_km', 'billable_km', 'distance_fare', 'driver_bata',
             'waiting_charge', 'night_charge', 'additional_passenger_charge',
             'total_fare', 'payment_method', 'payment_status', 'status',
             'cancellation_reason', 'customer_notes', 'has_review',

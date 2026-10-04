@@ -112,11 +112,18 @@ function checkUrlBookingParams() {
     }
 
     if (vType) {
-        currentBookingState.selectedVehicleType = vType.toLowerCase() === 'suv' ? 'SUV' : 'Sedan';
+        const v = vType.toLowerCase();
+        if (v.includes('crysta')) {
+            currentBookingState.selectedVehicleType = 'Innova Crysta';
+        } else if (v.includes('suv')) {
+            currentBookingState.selectedVehicleType = 'SUV';
+        } else {
+            currentBookingState.selectedVehicleType = 'Sedan';
+        }
     }
 }
 
-// Load vehicles dynamically from backend (Strictly Sedan & SUV)
+// Load vehicles dynamically from backend (Strictly Sedan, SUV & Innova Crysta)
 async function loadVehicles() {
     const container = document.getElementById('vehicles-selection-list');
     if (!container) return;
@@ -125,9 +132,9 @@ async function loadVehicles() {
 
     const res = await fetchWithAuth(`${CONFIG.API_BASE_URL}/vehicles/`);
     if (res.ok && res.data.vehicles) {
-        // Strictly allow only Sedan and SUV
+        // Strictly allow only Sedan, SUV, and Innova Crysta
         availableVehicles = res.data.vehicles.filter(v => 
-            v.status === 'available' && ['sedan', 'suv'].includes((v.vehicle_type || '').toLowerCase())
+            v.status === 'available' && ['sedan', 'suv', 'innova crysta'].includes((v.vehicle_type || '').toLowerCase())
         );
         renderVehicleCards(availableVehicles);
     } else {
@@ -144,7 +151,7 @@ function renderVehicleCards(vehicles) {
         return;
     }
 
-    // Default selection: Sedan or first vehicle
+    // Default selection: currently selected or first vehicle
     let defaultVehicle = vehicles.find(v => v.vehicle_type.toLowerCase() === currentBookingState.selectedVehicleType.toLowerCase()) || vehicles[0];
     currentBookingState.selectedVehicleId = defaultVehicle.id;
     currentBookingState.selectedVehicleType = defaultVehicle.vehicle_type;
@@ -152,12 +159,23 @@ function renderVehicleCards(vehicles) {
     let html = '';
     vehicles.forEach(v => {
         const isSelected = v.id === currentBookingState.selectedVehicleId;
-        const fallbackImg = v.vehicle_type === 'SUV' 
-            ? 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=300&q=80'
-            : 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=300&q=80';
+        const vt = (v.vehicle_type || '').toLowerCase();
+        
+        let fallbackImg = 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=300&q=80';
+        let displayName = 'Sedan';
+        let carSubtitle = 'Dzire / Etios (4+1 Seats AC)';
+
+        if (vt.includes('crysta')) {
+            fallbackImg = 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=300&q=80';
+            displayName = 'Innova Crysta';
+            carSubtitle = 'Innova Crysta (7+1 Luxury AC)';
+        } else if (vt.includes('suv')) {
+            fallbackImg = 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=300&q=80';
+            displayName = 'SUV';
+            carSubtitle = 'Innova / Ertiga (6+1 Seats AC)';
+        }
+
         const imgUrl = v.image_url || fallbackImg;
-        const displayName = v.vehicle_type === 'SUV' ? 'SUV' : 'Sedan';
-        const carSubtitle = v.vehicle_type === 'SUV' ? 'Innova / Ertiga (6+1 Seats)' : 'Dzire / Etios (4+1 Seats)';
 
         html += `
             <div class="vehicle-select-item ${isSelected ? 'selected' : ''}" id="v-card-${v.id}" onclick="selectVehicle(${v.id}, '${v.vehicle_type}')">
@@ -170,7 +188,7 @@ function renderVehicleCards(vehicles) {
                 </div>
                 <div class="text-end">
                     <div class="fw-bold text-dark fs-5">₹${parseFloat(v.price_per_km).toFixed(0)}<small class="text-muted fs-6">/KM</small></div>
-                    <small class="text-muted">Base: ₹${parseFloat(v.base_fare).toFixed(0)}</small>
+                    <small class="text-muted">Min 130 KM Base</small>
                 </div>
             </div>
         `;
@@ -252,23 +270,37 @@ function renderFareBreakdown(est) {
     const card = document.getElementById('fare-breakdown-card');
     if (!card) return;
 
+    const distNote = est.min_km_applied 
+        ? `<span class="badge bg-warning-subtle text-dark border border-warning ms-1" style="font-size: 0.72rem;">Min ${est.min_km} KM Base</span>` 
+        : '';
+
     card.innerHTML = `
         <h5 class="fw-bold mb-3 d-flex align-items-center justify-content-between">
             <span>Fare Estimation</span>
             <span class="badge bg-warning text-dark">${est.vehicle_type}</span>
         </h5>
         
-        <div class="d-flex justify-content-between py-2 border-bottom">
-            <span class="text-muted">Distance (${est.distance_km} KM @ ₹${est.price_per_km}/KM)</span>
-            <span class="fw-semibold">₹${est.distance_fare.toFixed(2)}</span>
+        <!-- Base Distance Fare with Min 130 KM Rule -->
+        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+            <div>
+                <span class="text-dark fw-semibold">Distance (${est.distance_km} KM)</span> ${distNote}
+                <div class="small text-muted">Billed: ${est.billable_km} KM @ ₹${est.price_per_km}/KM</div>
+            </div>
+            <span class="fw-bold fs-6">₹${est.distance_fare.toFixed(2)}</span>
         </div>
-        <div class="d-flex justify-content-between py-2 border-bottom">
-            <span class="text-muted">Base Ride Fare</span>
-            <span class="fw-semibold">₹${est.base_fare.toFixed(2)}</span>
+
+        <!-- Driver Bata (₹400) -->
+        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+            <div>
+                <span class="text-dark fw-semibold"><i class="bi bi-person-badge-fill text-success me-1"></i> Driver Bata</span>
+                <div class="small text-muted">Standard one-way driver allowance</div>
+            </div>
+            <span class="fw-bold text-success fs-6">₹${parseFloat(est.driver_bata || 400).toFixed(2)}</span>
         </div>
+
         ${est.night_charge > 0 ? `
             <div class="d-flex justify-content-between py-2 border-bottom text-warning">
-                <span><i class="bi bi-moon-stars-fill me-1"></i> Night Surcharge</span>
+                <span><i class="bi bi-moon-stars-fill me-1"></i> Night Surcharge (10 PM - 6 AM)</span>
                 <span class="fw-semibold">+₹${est.night_charge.toFixed(2)}</span>
             </div>
         ` : ''}
@@ -279,15 +311,30 @@ function renderFareBreakdown(est) {
             </div>
         ` : ''}
 
+        <!-- Total Fare Box -->
         <div class="fare-total-highlight mt-3">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="small text-white-50">Total Estimated Fare</div>
+                    <div class="small text-white-50">Total Estimated Trip Fare</div>
                     <div class="total-price">₹${est.total_fare.toFixed(2)}</div>
                 </div>
                 <div class="text-end text-white-50 small">
                     <i class="bi bi-clock-history me-1"></i> ~${currentBookingState.durationMins} mins
                 </div>
+            </div>
+        </div>
+
+        <!-- Prominent Customer Notice: Toll, Parking, State Tax at actuals -->
+        <div class="mt-3 p-3 rounded-3 bg-light border border-warning">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-shield-exclamation text-warning fs-5"></i>
+                <strong class="text-dark small text-uppercase">Extra Charges Notice (Payable at Actuals)</strong>
+            </div>
+            <div class="row g-2 small text-muted">
+                <div class="col-6"><i class="bi bi-signpost-split-fill text-primary me-1"></i> <strong>Toll:</strong> Fastag receipts</div>
+                <div class="col-6"><i class="bi bi-p-square-fill text-primary me-1"></i> <strong>Parking:</strong> At actuals</div>
+                <div class="col-6"><i class="bi bi-bank text-primary me-1"></i> <strong>State Tax:</strong> Interstate permit</div>
+                <div class="col-6"><i class="bi bi-triangle-fill text-primary me-1"></i> <strong>Hill Charges:</strong> If applicable</div>
             </div>
         </div>
 
@@ -474,6 +521,11 @@ async function submitBookingOrder() {
 function generateWhatsAppBookingLink(booking, customerName, customerPhone) {
     const vType = booking.vehicle_details?.vehicle_type || 'Taxi';
     const vName = booking.vehicle_details?.name || '';
+    const isMinApplied = (booking.billable_km && booking.billable_km > booking.distance_km) || (booking.distance_km < 130);
+    const distText = isMinApplied
+        ? `${booking.distance_km} KM (Min 130 KM Base applied)`
+        : `${booking.distance_km} KM`;
+
     const text = 
         `🚕 *NEW BOOKING - JHAZ 1 WAY TAXI*\n` +
         `━━━━━━━━━━━━━━━━━━━━\n` +
@@ -485,9 +537,19 @@ function generateWhatsAppBookingLink(booking, customerName, customerPhone) {
         `📅 *Date & Time:* ${booking.pickup_date} at ${booking.pickup_time}\n` +
         `🚗 *Vehicle Type:* ${vType} (${vName})\n` +
         `👥 *Passengers:* ${booking.passengers}\n` +
-        `🛣️ *Distance:* ${booking.distance_km} KM\n` +
-        `💰 *Total Fare:* ₹${booking.total_fare}\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `📊 *FARE BREAKDOWN:*\n` +
+        `🛣️ *Distance:* ${distText}\n` +
+        (booking.price_per_km ? `🏷️ *Rate:* ₹${booking.price_per_km}/KM\n` : '') +
+        (booking.distance_fare ? `💵 *Distance Fare:* ₹${booking.distance_fare}\n` : '') +
+        `👨‍✈️ *Driver Bata:* ₹${booking.driver_bata || 400}\n` +
+        `💰 *Total Estimated Fare:* ₹${booking.total_fare}\n` +
         `💳 *Payment Mode:* ${(booking.payment_method || 'CASH').toUpperCase()}\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `⚠️ *Extra Charges Notice:*\n` +
+        `• 🛣️ Toll Charges (Fastag) : At actuals\n` +
+        `• 🅿️ Parking Charges : At actuals\n` +
+        `• 🏛️ State Tax / Permit : At actuals (if interstate)\n` +
         (booking.customer_notes ? `📝 *Special Notes:* ${booking.customer_notes}\n` : '') +
         `━━━━━━━━━━━━━━━━━━━━\n` +
         `🚖 *Jhaz 1 Way Taxi*\n` +
@@ -507,6 +569,8 @@ function showBookingSuccessModal(booking, customerName, customerPhone, whatsappU
         modalEl.setAttribute('data-bs-backdrop', 'static');
         document.body.appendChild(modalEl);
     }
+
+    const isMinApplied = (booking.billable_km && booking.billable_km > booking.distance_km) || (booking.distance_km < 130);
 
     modalEl.innerHTML = `
         <div class="modal-dialog modal-dialog-centered">
@@ -549,10 +613,23 @@ function showBookingSuccessModal(booking, customerName, customerPhone, whatsappU
                             <span class="text-muted small">Vehicle:</span>
                             <span class="badge bg-warning text-dark">${booking.vehicle_details?.vehicle_type || 'Taxi'} (${booking.vehicle_details?.name || ''})</span>
                         </div>
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                            <span class="text-muted small">Distance &amp; Rate:</span>
+                            <span class="fw-semibold text-dark">${booking.distance_km} KM ${isMinApplied ? '(Min 130 KM Base)' : ''}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                            <span class="text-muted small">Driver Bata:</span>
+                            <span class="fw-semibold text-success">₹${booking.driver_bata || 400}</span>
+                        </div>
                         <div class="d-flex justify-content-between align-items-center pt-1">
-                            <span class="fw-bold text-dark">Estimated Fare:</span>
+                            <span class="fw-bold text-dark fs-6">Total Estimated Fare:</span>
                             <span class="fs-4 fw-bold text-success">₹${booking.total_fare}</span>
                         </div>
+                    </div>
+
+                    <!-- Customer Extra Charges Reminder -->
+                    <div class="alert alert-warning border-0 rounded-3 p-2 small mb-3 text-dark">
+                        <i class="bi bi-info-circle-fill text-warning me-1"></i> <strong>Note:</strong> Toll charges (Fastag), Parking fees, and Interstate State Tax are extra at actuals.
                     </div>
 
                     <div class="d-grid gap-2">

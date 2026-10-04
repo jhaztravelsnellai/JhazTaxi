@@ -1403,43 +1403,101 @@ async function loadVehicleFares() {
         return;
     }
 
-    container.innerHTML = fares.map(f => `
-        <div class="col-md-6 col-xl-3">
-            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
-                <div class="card-header bg-dark text-white rounded-top-4 py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 fw-bold">${f.vehicle_type} Class</h6>
-                    <span class="badge ${f.is_active ? 'bg-success' : 'bg-secondary'}">${f.is_active ? 'Active' : 'Disabled'}</span>
+    // Vehicle icon & model hints
+    const vMeta = {
+        'Sedan': { icon: 'bi-car-front-fill', models: 'Dzire / Etios (4+1 Seats)', badge: 'Economy Sedan' },
+        'SUV': { icon: 'bi-truck-front-fill', models: 'Innova / Ertiga (6+1 Seats)', badge: 'Family SUV' },
+        'Innova Crysta': { icon: 'bi-stars', models: 'Toyota Innova Crysta (7+1 Luxury AC)', badge: 'Luxury Crysta' }
+    };
+
+    container.innerHTML = fares.map(f => {
+        const meta = vMeta[f.vehicle_type] || { icon: 'bi-car-front-fill', models: f.vehicle_type, badge: 'Standard' };
+        const pricePerKm = parseFloat(f.price_per_km || 14).toFixed(0);
+        const minKm = parseFloat(f.min_km || 130).toFixed(0);
+        const driverBata = parseFloat(f.driver_bata || 400).toFixed(0);
+
+        return `
+        <div class="col-lg-4 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white border-top border-4 border-warning">
+                <div class="card-header bg-white border-0 pt-4 pb-2 px-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-warning-subtle text-dark border border-warning fw-bold mb-1">${meta.badge}</span>
+                        <h5 class="mb-0 fw-bold text-dark"><i class="bi ${meta.icon} text-warning me-2"></i>${f.vehicle_type}</h5>
+                        <small class="text-muted d-block">${meta.models}</small>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-warning text-dark fs-5 fw-bold px-3 py-2 shadow-sm" id="badge-rate-${f.vehicle_type}">
+                            ₹${pricePerKm} <span class="fs-6 fw-normal">/KM</span>
+                        </span>
+                        <div class="small text-muted mt-1">Live KM Rate</div>
+                    </div>
                 </div>
-                <div class="card-body p-3">
+
+                <div class="card-body p-4 pt-2">
+                    <div class="bg-light p-3 rounded-3 mb-3 border">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="small text-muted"><i class="bi bi-geo-alt-fill text-primary me-1"></i>Min Base Distance:</span>
+                            <span class="fw-bold text-dark">${minKm} KM</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="small text-muted"><i class="bi bi-person-badge-fill text-success me-1"></i>Driver Bata:</span>
+                            <span class="fw-bold text-dark">₹${driverBata}</span>
+                        </div>
+                    </div>
+
                     <form onsubmit="saveVehicleFare('${f.vehicle_type}', event)">
-                        <div class="mb-2">
-                            <label class="form-label small fw-bold text-muted mb-1">Base Fare (₹)</label>
-                            <input type="number" step="0.5" class="form-control form-control-sm" name="base_fare" value="${f.base_fare}" required>
+                        <div class="row g-2">
+                            <div class="col-12 mb-2">
+                                <label class="form-label small fw-bold text-dark mb-1">
+                                    <i class="bi bi-speedometer2 text-warning me-1"></i> Per KM Rate Price (₹ / KM) *
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-warning-subtle fw-bold">₹</span>
+                                    <input type="number" step="0.5" class="form-control fw-bold fs-5 text-primary border-warning" name="price_per_km" value="${f.price_per_km}" required>
+                                    <span class="input-group-text bg-light text-muted">/ KM</span>
+                                </div>
+                                <small class="text-muted">Admin can change this KM price anytime.</small>
+                            </div>
+
+                            <div class="col-6 mb-2">
+                                <label class="form-label small fw-bold text-muted mb-1">Min Base KM</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="1" class="form-control fw-semibold" name="min_km" value="${minKm}" required>
+                                    <span class="input-group-text">KM</span>
+                                </div>
+                            </div>
+
+                            <div class="col-6 mb-2">
+                                <label class="form-label small fw-bold text-muted mb-1">Driver Bata (₹)</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">₹</span>
+                                    <input type="number" step="10" class="form-control fw-semibold" name="driver_bata" value="${driverBata}" required>
+                                </div>
+                            </div>
+
+                            <div class="col-6 mb-2">
+                                <label class="form-label small fw-bold text-muted mb-1">Base Fare (₹)</label>
+                                <input type="number" step="1" class="form-control form-control-sm" name="base_fare" value="${f.base_fare}" required>
+                            </div>
+
+                            <div class="col-6 mb-2">
+                                <label class="form-label small fw-bold text-muted mb-1">Night Charge (%)</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="1" class="form-control" name="night_charge_percent" value="${f.night_charge_percent || 20}">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-2">
-                            <label class="form-label small fw-bold text-muted mb-1">Rate / Km (₹)</label>
-                            <input type="number" step="0.5" class="form-control form-control-sm" name="price_per_km" value="${f.price_per_km}" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label small fw-bold text-muted mb-1">Min Fare (₹)</label>
-                            <input type="number" step="0.5" class="form-control form-control-sm" name="min_fare" value="${f.min_fare || f.base_fare}" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label small fw-bold text-muted mb-1">Waiting Fee / Min (₹)</label>
-                            <input type="number" step="0.5" class="form-control form-control-sm" name="waiting_charge_per_min" value="${f.waiting_charge_per_min || 2.0}">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold text-muted mb-1">Night Charge (%)</label>
-                            <input type="number" step="1" class="form-control form-control-sm" name="night_charge_percent" value="${f.night_charge_percent || 20}">
-                        </div>
-                        <button type="submit" class="btn btn-warning btn-sm w-100 fw-bold">
-                            <i class="bi bi-save me-1"></i> Update ${f.vehicle_type} Rates
+
+                        <button type="submit" class="btn btn-warning w-100 fw-bold mt-3 py-2 shadow-sm" id="btn-fare-${f.vehicle_type}">
+                            <i class="bi bi-check2-circle me-1"></i> Update ${f.vehicle_type} Rates
                         </button>
                     </form>
                 </div>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 async function saveVehicleFare(vType, e) {
@@ -1449,22 +1507,35 @@ async function saveVehicleFare(vType, e) {
     const btn = form.querySelector('button[type="submit"]');
 
     const payload = {
-        base_fare: form.base_fare.value,
         price_per_km: form.price_per_km.value,
-        min_fare: form.min_fare.value,
-        waiting_charge_per_min: form.waiting_charge_per_min.value,
-        night_charge_percent: form.night_charge_percent.value
+        min_km: form.min_km ? form.min_km.value : 130,
+        driver_bata: form.driver_bata ? form.driver_bata.value : 400,
+        base_fare: form.base_fare.value,
+        night_charge_percent: form.night_charge_percent ? form.night_charge_percent.value : 20
     };
 
-    if (btn) btn.disabled = true;
-    const res = await fetchWithAuth(`${CONFIG.API_BASE_URL}/fare-settings/${vType}/`, {
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving Rates...';
+    }
+
+    const res = await fetchWithAuth(`${CONFIG.API_BASE_URL}/fare-settings/${encodeURIComponent(vType)}/`, {
         method: 'PUT',
         body: JSON.stringify(payload)
     });
-    if (btn) btn.disabled = false;
+
+    if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="bi bi-check2-circle me-1"></i> Update ${vType} Rates`;
+    }
 
     if (res.ok && res.data.success) {
-        showToast(`${vType} fare rates updated successfully!`, 'success');
+        showToast(`${vType} rate updated to ₹${payload.price_per_km}/KM!`, 'success');
+        // Update live badge immediately
+        const rateBadge = document.getElementById(`badge-rate-${vType}`);
+        if (rateBadge) {
+            rateBadge.innerHTML = `₹${parseFloat(payload.price_per_km).toFixed(0)} <span class="fs-6 fw-normal">/KM</span>`;
+        }
         loadVehicleFares();
     } else {
         showToast(res.data.message || `Failed to update ${vType} rates`, 'error');

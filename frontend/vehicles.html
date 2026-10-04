@@ -132,8 +132,8 @@
             if (res.ok && res.data.vehicles) {
                 const vehicles = res.data.vehicles;
                 grid.innerHTML = vehicles.map(v => `
-                    <div class="col-md-6">
-                        <div class="vehicle-card h-100 shadow-sm">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="vehicle-card h-100 shadow-sm border-0">
                             <div class="vehicle-img-wrapper" style="height: 220px;">
                                 <span class="vehicle-type-pill fs-6 px-3 py-1">${v.vehicle_type}</span>
                                 <img src="${v.image_url || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80'}" alt="${v.name}">
@@ -143,18 +143,23 @@
                                     <h5 class="fw-bold mb-1">${v.name}</h5>
                                     <div class="text-muted small mb-2"><i class="bi bi-people-fill me-1"></i>${v.capacity} Passengers &bull; Plate: <code>${v.vehicle_number}</code></div>
                                     <p class="text-muted small">${v.description || 'Premium air-conditioned vehicle maintained with highest hygiene standards.'}</p>
+                                    <div class="d-flex flex-wrap gap-1 mb-2">
+                                        <span class="badge bg-warning-subtle text-dark border border-warning" style="font-size: 0.72rem;">Min 130 KM Base</span>
+                                        <span class="badge bg-light text-dark border" style="font-size: 0.72rem;">Driver Bata ₹400</span>
+                                        <span class="badge bg-light text-muted border" style="font-size: 0.72rem;">Toll/Tax Extra</span>
+                                    </div>
                                 </div>
-                                <div class="border-top pt-3 mt-3">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="text-muted small">Base Rate:</span>
-                                        <strong>₹${parseFloat(v.base_fare).toFixed(2)}</strong>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="border-top pt-3 mt-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
                                         <span class="text-muted small">Rate per KM:</span>
-                                        <span class="text-dark fw-bold fs-5">₹${parseFloat(v.price_per_km).toFixed(2)}</span>
+                                        <span class="text-dark fw-bold fs-4">₹${parseFloat(v.price_per_km).toFixed(0)}<small class="fs-6 text-muted">/KM</small></span>
                                     </div>
-                                    <a href="/booking.html?vehicle=${v.vehicle_type}" class="btn btn-yellow w-100 fw-bold">
-                                        Book This Ride
+                                    <div class="d-flex justify-content-between align-items-center mb-3 text-muted small">
+                                        <span>Min 130 KM Fare:</span>
+                                        <strong class="text-dark">₹${(130 * parseFloat(v.price_per_km) + 400).toFixed(0)} (inc. Bata)</strong>
+                                    </div>
+                                    <a href="/booking.html?vehicle=${encodeURIComponent(v.vehicle_type)}" class="btn btn-yellow w-100 fw-bold">
+                                        Book ${v.vehicle_type} &rarr;
                                     </a>
                                 </div>
                             </div>
