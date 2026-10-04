@@ -816,13 +816,13 @@ async function initAdminLiveMap() {
     adminMap = L.map('admin-live-map').setView(CONFIG.MAP_DEFAULT_CENTER, 12);
     const tileUrl = (typeof CONFIG !== 'undefined' && CONFIG.MAP_TILE_URL) 
         ? CONFIG.MAP_TILE_URL 
-        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+        : 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png';
     const subdomains = (typeof CONFIG !== 'undefined' && CONFIG.MAP_TILE_SUBDOMAINS)
         ? CONFIG.MAP_TILE_SUBDOMAINS
-        : ['a', 'b', 'c', 'd'];
+        : ['a', 'b', 'c'];
     const attribution = (typeof CONFIG !== 'undefined' && CONFIG.MAP_ATTRIBUTION)
         ? CONFIG.MAP_ATTRIBUTION
-        : '&copy; OpenStreetMap contributors &copy; CARTO';
+        : '&copy; OpenStreetMap contributors, OSM France';
 
     L.tileLayer(tileUrl, {
         subdomains: subdomains,

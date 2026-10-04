@@ -184,15 +184,15 @@ async function loadHomepageVehicleRates() {
                     let pillClass = 'bg-warning text-dark';
                     let subtitle = 'Up to 4 Passengers &bull; AC &bull; Large Boot';
                     let desc = v.description || 'Comfortable, air-conditioned sedan tailored for outstation one-way drops, airport runs, and city commutes.';
-                    let img = v.image_url || 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=800&q=80';
+                    let img = v.image_url || '/assets/vehicles/sedan_dzire.jpg';
 
                     if (vt.includes('crysta')) {
                         pillClass = 'bg-dark text-warning';
                         subtitle = 'Up to 7 Passengers &bull; Captain Seats AC';
-                        img = v.image_url || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80';
+                        img = v.image_url || '/assets/vehicles/innova_crysta.jpg';
                     } else if (vt.includes('suv')) {
                         subtitle = 'Up to 6 Passengers &bull; Dual AC &bull; Spacious';
-                        img = v.image_url || 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80';
+                        img = v.image_url || '/assets/vehicles/suv_ertiga.jpg';
                     }
 
                     const pricePerKm = parseFloat(v.price_per_km || 14).toFixed(0);
@@ -203,7 +203,7 @@ async function loadHomepageVehicleRates() {
                             <div class="vehicle-card h-100 shadow-sm border-0">
                                 <div class="vehicle-img-wrapper" style="height: 200px;">
                                     <span class="vehicle-type-pill fs-6 px-3 py-1 ${pillClass}">${v.vehicle_type}</span>
-                                    <img src="${img}" alt="${v.name}" onerror="this.src='https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=800&q=80'">
+                                    <img src="${img}" alt="${v.name}" onerror="this.src='/assets/vehicles/sedan_dzire.jpg'">
                                 </div>
                                 <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
                                     <div>

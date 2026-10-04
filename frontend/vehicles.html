@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cab Fleet & Vehicle Categories - Sedan, SUV, Mini, Luxury | JhazTaxi</title>
-    <meta name="description" content="Explore JhazTaxi's diverse taxi fleet: Mini, Sedan, SUV, and Premium luxury cabs. Clear per-KM pricing, comfortable seating, and GPS-verified drivers.">
-    <meta name="keywords" content="taxi fleet, cab categories, sedan cab, mini taxi, innova suv, premium cab, JhazTaxi vehicles, car rental with driver">
+    <title>Tirunelveli Taxi Fleet - Sedan, SUV & Innova Crysta | Jhaz 1 Way Taxi</title>
+    <meta name="description" content="Explore Jhaz 1 Way Taxi's verified vehicle fleet in Tirunelveli: Sedan (Dzire), SUV (Ertiga), and Luxury Innova Crysta. Transparent per-KM pricing with zero return charges.">
+    <meta name="keywords" content="tirunelveli taxi fleet, sedan taxi tirunelveli, innova crysta rental nellai, suv cab booking tirunelveli, 9043519772">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://jhaztaxi.com/vehicles.html">
+    <link rel="canonical" href="https://jhaztaxi.onrender.com/vehicles.html">
 
     <!-- Favicon & PWA -->
     <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg">
@@ -16,11 +16,11 @@
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://jhaztaxi.com/vehicles.html">
-    <meta property="og:site_name" content="JhazTaxi">
-    <meta property="og:title" content="Cab Fleet & Vehicle Categories | JhazTaxi">
-    <meta property="og:description" content="Explore JhazTaxi's diverse taxi fleet: Mini, Sedan, SUV, and Premium luxury cabs with transparent pricing.">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80">
+    <meta property="og:url" content="https://jhaztaxi.onrender.com/vehicles.html">
+    <meta property="og:site_name" content="Jhaz 1 Way Taxi - Tirunelveli">
+    <meta property="og:title" content="Tirunelveli Taxi Fleet - Sedan, SUV & Innova Crysta | Jhaz 1 Way Taxi">
+    <meta property="og:description" content="Explore Jhaz 1 Way Taxi's verified vehicle fleet in Tirunelveli: Sedan, SUV, and luxury Innova Crysta cabs.">
+    <meta property="og:image" content="/assets/vehicles/innova_crysta.jpg">
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image">
@@ -137,12 +137,18 @@
                 const order = { 'sedan': 1, 'suv': 2, 'innova crysta': 3 };
                 vehicles.sort((a, b) => (order[(a.vehicle_type || '').toLowerCase()] || 99) - (order[(b.vehicle_type || '').toLowerCase()] || 99));
 
-                grid.innerHTML = vehicles.map(v => `
+                grid.innerHTML = vehicles.map(v => {
+                    const vt = (v.vehicle_type || '').toLowerCase();
+                    let defaultImg = '/assets/vehicles/sedan_dzire.jpg';
+                    if (vt.includes('crysta')) defaultImg = '/assets/vehicles/innova_crysta.jpg';
+                    else if (vt.includes('suv')) defaultImg = '/assets/vehicles/suv_ertiga.jpg';
+
+                    return `
                     <div class="col-lg-4 col-md-6">
                         <div class="vehicle-card h-100 shadow-sm border-0">
                             <div class="vehicle-img-wrapper" style="height: 220px;">
                                 <span class="vehicle-type-pill fs-6 px-3 py-1">${v.vehicle_type}</span>
-                                <img src="${v.image_url || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80'}" alt="${v.name}">
+                                <img src="${v.image_url || defaultImg}" alt="${v.name}" onerror="this.src='${defaultImg}'">
                             </div>
                             <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between">
                                 <div>

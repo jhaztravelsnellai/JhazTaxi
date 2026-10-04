@@ -164,16 +164,16 @@ function renderVehicleCards(vehicles) {
         const isSelected = v.id === currentBookingState.selectedVehicleId;
         const vt = (v.vehicle_type || '').toLowerCase();
         
-        let fallbackImg = 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=300&q=80';
+        let fallbackImg = '/assets/vehicles/sedan_dzire.jpg';
         let displayName = 'Sedan';
         let carSubtitle = 'Dzire / Etios (4+1 Seats AC)';
 
         if (vt.includes('crysta')) {
-            fallbackImg = 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=300&q=80';
+            fallbackImg = '/assets/vehicles/innova_crysta.jpg';
             displayName = 'Innova Crysta';
             carSubtitle = 'Innova Crysta (7+1 Luxury AC)';
         } else if (vt.includes('suv')) {
-            fallbackImg = 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=300&q=80';
+            fallbackImg = '/assets/vehicles/suv_ertiga.jpg';
             displayName = 'SUV';
             carSubtitle = 'Innova / Ertiga (6+1 Seats AC)';
         }
@@ -723,3 +723,28 @@ function triggerUseCurrentLocation(type = 'pickup') {
         if (btn) btn.innerHTML = '<i class="bi bi-crosshair"></i>';
     });
 }
+
+// Tirunelveli Quick Suggestions Helpers
+window.setQuickLocation = function(type, locationName) {
+    const inputId = type === 'pickup' ? 'pickup-address' : 'drop-address';
+    const input = document.getElementById(inputId);
+    if (input) input.value = locationName;
+    if (mapService && typeof mapService.searchLocation === 'function') {
+        mapService.searchLocation(locationName).then(results => {
+            if (results && results.length > 0) {
+                if (type === 'pickup') {
+                    mapService.setPickup(results[0].lat, results[0].lng, results[0].displayName);
+                } else {
+                    mapService.setDrop(results[0].lat, results[0].lng, results[0].displayName);
+                }
+            }
+        });
+    }
+};
+
+window.setQuickRoute = function(pickupLoc, dropLoc) {
+    setQuickLocation('pickup', pickupLoc);
+    setTimeout(() => {
+        setQuickLocation('drop', dropLoc);
+    }, 400);
+};

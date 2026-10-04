@@ -31,18 +31,18 @@ class JhazMapService {
             scrollWheelZoom: true
         }).setView(CONFIG.MAP_DEFAULT_CENTER, CONFIG.MAP_DEFAULT_ZOOM);
 
-        // High-Speed CARTO Voyager CDN Tile Layer (Free, Fast, NEVER blocked on Render/Vercel)
+        // 100% Free OpenStreetMap France Tile Layer (Zero API key needed, never blocked)
         const tileUrl = (typeof CONFIG !== 'undefined' && CONFIG.MAP_TILE_URL) 
             ? CONFIG.MAP_TILE_URL 
-            : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+            : 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png';
         const subdomains = (typeof CONFIG !== 'undefined' && CONFIG.MAP_TILE_SUBDOMAINS)
             ? CONFIG.MAP_TILE_SUBDOMAINS
-            : ['a', 'b', 'c', 'd'];
+            : ['a', 'b', 'c'];
         const attribution = (typeof CONFIG !== 'undefined' && CONFIG.MAP_ATTRIBUTION)
             ? CONFIG.MAP_ATTRIBUTION
-            : '&copy; OpenStreetMap contributors &copy; CARTO';
+            : '&copy; OpenStreetMap contributors, OSM France';
 
-        L.tileLayer(tileUrl, {
+        const mainTileLayer = L.tileLayer(tileUrl, {
             subdomains: subdomains,
             maxZoom: 20,
             attribution: attribution
@@ -258,32 +258,74 @@ class JhazMapService {
         this.map.fitBounds(bounds, { padding: [50, 50] });
     }
 
-    // Geocode Search: Uses Photon API as primary (never blocks Render / CORS enabled), with Nominatim fallback
+    // Geocode Search: Tirunelveli-first presets + Photon API with Tirunelveli location bias + Nominatim fallback
     async searchLocation(query) {
-        if (!query || query.length < 3) return [];
+        if (!query || query.trim().length < 2) return [];
 
-        // 1. Try Photon Geocoder (Fast, OpenStreetMap data, allows Render & CORS)
+        const qLower = query.toLowerCase().trim();
+        const results = [];
+
+        // Instant Local Presets for Tirunelveli & South India
+        const TIRUNELVELI_PRESETS = [
+            { displayName: 'Tirunelveli Junction Railway Station (TEN), Tamil Nadu', lat: 8.7289, lng: 77.7088 },
+            { displayName: 'New Bus Stand (Vaeinthankulam), Tirunelveli, Tamil Nadu', lat: 8.7061, lng: 77.7286 },
+            { displayName: 'Palayamkottai, Tirunelveli, Tamil Nadu', lat: 8.7176, lng: 77.7479 },
+            { displayName: 'Vannarpettai, Tirunelveli, Tamil Nadu', lat: 8.7275, lng: 77.7214 },
+            { displayName: 'Thatchanallur, Tirunelveli, Tamil Nadu', lat: 8.7511, lng: 77.7161 },
+            { displayName: 'Pettai, Tirunelveli, Tamil Nadu', lat: 8.7196, lng: 77.6713 },
+            { displayName: 'Melapalayam, Tirunelveli, Tamil Nadu', lat: 8.7012, lng: 77.7314 },
+            { displayName: 'High Ground, Palayamkottai, Tirunelveli', lat: 8.7118, lng: 77.7612 },
+            { displayName: 'Gangaikondan SIPCOT, Tirunelveli', lat: 8.8542, lng: 77.7812 },
+            { displayName: 'Madurai Airport (IXM), Tamil Nadu', lat: 9.8345, lng: 78.0934 },
+            { displayName: 'Madurai Junction Railway Station, Tamil Nadu', lat: 9.9195, lng: 78.1193 },
+            { displayName: 'Tuticorin (Thoothukudi) Airport (TCR), Tamil Nadu', lat: 8.7243, lng: 78.0261 },
+            { displayName: 'Courtallam Main Falls, Tenkasi, Tamil Nadu', lat: 8.9304, lng: 77.2753 },
+            { displayName: 'Tenkasi Junction, Tamil Nadu', lat: 8.9591, lng: 77.3087 },
+            { displayName: 'Kanyakumari, Tamil Nadu', lat: 8.0883, lng: 77.5385 },
+            { displayName: 'Trivandrum International Airport (TRV), Kerala', lat: 8.4821, lng: 76.9200 },
+            { displayName: 'Chennai Central Railway Station, Tamil Nadu', lat: 13.0827, lng: 80.2707 },
+            { displayName: 'Coimbatore Junction, Tamil Nadu', lat: 11.0016, lng: 76.9628 },
+            { displayName: 'Bangalore Majestic / Kempegowda, Karnataka', lat: 12.9767, lng: 77.5713 }
+        ];
+
+        // Check local matches first
+        TIRUNELVELI_PRESETS.forEach(item => {
+            const dLower = item.displayName.toLowerCase();
+            if (dLower.includes(qLower) || 
+                (qLower.includes('nellai') && dLower.includes('tirunelveli')) ||
+                (qLower.includes('junction') && dLower.includes('junction')) ||
+                (qLower.includes('bus stand') && dLower.includes('bus stand'))) {
+                results.push(item);
+            }
+        });
+
+        // 1. Try Photon Geocoder with Tirunelveli Lat/Lng bias
         try {
-            const photonUrl = `${(typeof CONFIG !== 'undefined' && CONFIG.PHOTON_SEARCH_URL) || 'https://photon.komoot.io/api/'}?q=${encodeURIComponent(query)}&limit=5`;
+            const photonUrl = `${(typeof CONFIG !== 'undefined' && CONFIG.PHOTON_SEARCH_URL) || 'https://photon.komoot.io/api/'}?q=${encodeURIComponent(query)}&lat=8.7139&lon=77.7567&limit=6`;
             const res = await fetch(photonUrl);
             if (res.ok) {
                 const data = await res.json();
                 if (data.features && data.features.length > 0) {
-                    return data.features.map(f => {
+                    data.features.forEach(f => {
                         const p = f.properties || {};
                         const parts = [p.name, p.street, p.district || p.city, p.state, p.country].filter(Boolean);
                         const label = parts.length > 1 ? parts.join(', ') : (p.name || 'Location');
-                        return {
-                            displayName: label,
-                            lat: f.geometry.coordinates[1],
-                            lng: f.geometry.coordinates[0]
-                        };
+                        // Avoid duplicates
+                        if (!results.some(r => r.displayName.toLowerCase() === label.toLowerCase())) {
+                            results.push({
+                                displayName: label,
+                                lat: f.geometry.coordinates[1],
+                                lng: f.geometry.coordinates[0]
+                            });
+                        }
                     });
                 }
             }
         } catch (e) {
             console.warn('Photon geocoding error, falling back:', e);
         }
+
+        if (results.length > 0) return results.slice(0, 6);
 
         // 2. Fallback to Nominatim OpenStreetMap
         try {

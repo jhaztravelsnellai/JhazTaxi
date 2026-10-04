@@ -28,10 +28,10 @@ const CONFIG = {
     MAP_DEFAULT_CENTER: [8.7139, 77.7567],
     MAP_DEFAULT_ZOOM: 12,
 
-    // Map Tile Configuration (CARTO Voyager CDN - 100% Free, Fast, NEVER blocked on Render/Vercel)
-    MAP_TILE_URL: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    MAP_TILE_SUBDOMAINS: ['a', 'b', 'c', 'd'],
-    MAP_ATTRIBUTION: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    // Map Tile Configuration (OpenStreetMap France - 100% Free, NO API Key Needed, NEVER blocked on Render/Vercel)
+    MAP_TILE_URL: 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
+    MAP_TILE_SUBDOMAINS: ['a', 'b', 'c'],
+    MAP_ATTRIBUTION: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="https://openstreetmap.fr">OSM France</a>',
 
     // Routing & Geocoding Services
     OSRM_ROUTING_URL: 'https://router.project-osrm.org/route/v1/driving/',

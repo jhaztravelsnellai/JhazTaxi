@@ -21,4 +21,4 @@ Disallow: /driver/dashboard.html
 Disallow: /api/
 
 # Sitemap location
-Sitemap: https://jhaztaxi.com/sitemap.xml
+Sitemap: https://jhaztaxi.onrender.com/sitemap.xml
